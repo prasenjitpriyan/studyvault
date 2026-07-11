@@ -9,4 +9,9 @@ const NoteSchema = new Schema({
   isFavorite: { type: Boolean, default: false },
 }, { timestamps: true });
 
-export default mongoose.models.Note || mongoose.model('Note', NoteSchema);
+// Force schema recompilation under Next.js dev server hot-reloading
+if (mongoose.models.Note) {
+  delete mongoose.models.Note;
+}
+
+export default mongoose.model('Note', NoteSchema);

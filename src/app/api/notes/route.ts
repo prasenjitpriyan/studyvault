@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
       content: content || '',
       folder: folder || 'General',
       tags: tags || [],
+      isFavorite: false,
     });
     await newNote.save();
 

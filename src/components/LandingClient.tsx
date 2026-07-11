@@ -197,7 +197,7 @@ export default function LandingClient() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="gsap-ctas flex flex-col xs:flex-row gap-3 w-full sm:w-auto">
+          <div className="gsap-ctas flex flex-col min-[480px]:flex-row gap-3 w-full sm:w-auto">
             <Link
               href="/signup"
               className="flex items-center justify-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all text-sm sm:text-base"
@@ -218,7 +218,7 @@ export default function LandingClient() {
           <svg
             width="450" height="450" viewBox="0 0 450 450"
             fill="none" xmlns="http://www.w3.org/2000/svg"
-            className="w-full max-w-60 sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px] drop-shadow-2xl"
+            className="w-full max-w-60 sm:max-w-[320px] md:max-w-95 lg:max-w-105 drop-shadow-2xl"
           >
             <circle cx="225" cy="225" r="125" fill="url(#vault-glow)" opacity="0.35" />
             <circle cx="225" cy="225" r="160" stroke="currentColor" strokeWidth="1.5" strokeDasharray="6 10" className="text-indigo-500/25 vault-ring-outer" />

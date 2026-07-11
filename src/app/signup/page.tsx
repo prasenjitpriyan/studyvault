@@ -66,48 +66,51 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Username</label>
+            <label htmlFor="signup-username" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Username</label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
+                id="signup-username"
                 type="text"
                 placeholder="yourusername"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder-muted-foreground text-foreground"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder:text-muted-foreground text-foreground"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Email Address</label>
+            <label htmlFor="signup-email" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
+                id="signup-email"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder-muted-foreground text-foreground"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder:text-muted-foreground text-foreground"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Password</label>
+            <label htmlFor="signup-password" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
+                id="signup-password"
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder-muted-foreground text-foreground"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder:text-muted-foreground text-foreground"
                 required
               />
             </div>

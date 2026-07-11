@@ -87,6 +87,9 @@ body {
   overflow-x: hidden;
 }
 
+/* xs breakpoint helper — used by LandingClient CTA row */
+@custom-media --xs (min-width: 480px);
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -104,6 +107,15 @@ body {
 }
 
 /* Smooth active components transitions */
+
+/* Hide scrollbar, keep scroll functionality */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 .glass-panel {
   background: var(--glass-bg);
   backdrop-filter: blur(12px);

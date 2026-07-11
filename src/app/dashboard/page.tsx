@@ -254,7 +254,7 @@ export default function DashboardPage() {
       {/* Header Greeting */}
       <div className="gsap-dash-header">
         <h1 className="text-3xl font-extrabold tracking-tight">Study Dashboard</h1>
-        <p className="text-sm text-zinc-400 mt-1">Review your statistics, manage goals, and start a study timer.</p>
+        <p className="text-sm text-muted-foreground mt-1">Review your statistics, manage goals, and start a study timer.</p>
       </div>
 
       {/* Stats Cards Grid */}

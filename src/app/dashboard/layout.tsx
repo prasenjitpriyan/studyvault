@@ -61,6 +61,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </button>
       </div>
 
+      {/* Mobile Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-10 bg-black/50 backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar - Desktop & Mobile */}
       <aside
         className={`fixed inset-y-0 left-0 z-20 flex flex-col w-64 bg-card/90 backdrop-blur-xl border-r border-border/80 transition-transform duration-300 transform md:translate-x-0 md:static ${

@@ -127,7 +127,7 @@ export default function TasksPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">Task Board</h1>
-          <p className="text-sm text-zinc-400 mt-1">Organize and prioritize your study goals on a Kanban timeline.</p>
+          <p className="text-sm text-muted-foreground mt-1">Organize and prioritize your study goals on a Kanban timeline.</p>
         </div>
         <button
           onClick={() => setModalOpen(true)}
@@ -230,27 +230,29 @@ export default function TasksPage() {
       {/* --- MODAL: CREATE TASK --- */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="w-full max-w-md bg-[#0f0f17] border border-zinc-800 rounded-2xl p-6 shadow-2xl relative">
+          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl relative">
             <h3 className="text-md font-bold mb-4">Create New Task</h3>
             <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Task Title</label>
+                <label htmlFor="task-title" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Task Title</label>
                 <input
+                  id="task-title"
                   type="text"
                   placeholder="e.g. Read Physics Chapter 3, Draft essay outline"
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-zinc-100"
+                  className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Priority</label>
+                <label htmlFor="task-priority" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Priority</label>
                 <select
+                  id="task-priority"
                   value={taskPriority}
                   onChange={(e) => setTaskPriority(e.target.value as 'low' | 'medium' | 'high')}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-zinc-300"
+                  className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
                 >
                   <option value="low">Low Priority</option>
                   <option value="medium">Medium Priority</option>
@@ -259,12 +261,13 @@ export default function TasksPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Due Date (Optional)</label>
+                <label htmlFor="task-due-date" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Due Date (Optional)</label>
                 <input
+                  id="task-due-date"
                   type="date"
                   value={taskDueDate}
                   onChange={(e) => setTaskDueDate(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-zinc-300"
+                  className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
                 />
               </div>
 
@@ -272,7 +275,7 @@ export default function TasksPage() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-200"
+                  className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Cancel
                 </button>

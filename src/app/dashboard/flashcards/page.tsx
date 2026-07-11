@@ -226,7 +226,7 @@ export default function FlashcardsPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight">Active Recall Decks</h1>
-              <p className="text-sm text-zinc-400 mt-1">Review flashcards with optimized spaced repetition schedules.</p>
+              <p className="text-sm text-muted-foreground mt-1">Review flashcards with optimized spaced repetition schedules.</p>
             </div>
             <button
               onClick={() => setDeckModalOpen(true)}
@@ -237,7 +237,7 @@ export default function FlashcardsPage() {
           </div>
 
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 text-zinc-500 gap-2">
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
               <Loader2 className="h-6 w-6 animate-spin text-indigo-400" /> Loading study decks...
             </div>
           ) : decks.length === 0 ? (
@@ -491,7 +491,7 @@ export default function FlashcardsPage() {
                         <td className="p-4 text-right">
                           <button
                             onClick={() => handleDeleteCard(card._id)}
-                            className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                            className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                             title="Delete Card"
                           >
                             <Trash2 className="h-4 w-4" />

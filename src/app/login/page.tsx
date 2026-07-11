@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#09090b] text-zinc-100 flex flex-col justify-center items-center px-4 overflow-hidden">
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-center items-center px-4 overflow-hidden">
       <Toaster position="top-center" theme="dark" richColors />
 
       {/* Glow Effects */}
@@ -60,37 +60,37 @@ export default function LoginPage() {
             <span className="text-gradient font-extrabold">StudyVault</span>
           </Link>
           <h2 className="text-2xl font-bold">Welcome Back</h2>
-          <p className="text-sm text-zinc-400 mt-1">Access your study vault and resume learning</p>
+          <p className="text-sm text-muted-foreground mt-1">Access your study vault and resume learning</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Email Address</label>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="w-full pl-10 pr-4 py-3 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder-zinc-500"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder-muted-foreground text-foreground"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Password</label>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Password</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="w-full pl-10 pr-4 py-3 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder-zinc-500"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none transition-all text-sm placeholder-muted-foreground text-foreground"
                 required
               />
             </div>
@@ -111,9 +111,9 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-zinc-400">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
+          <Link href="/signup" className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 font-semibold transition-colors">
             Create one
           </Link>
         </div>

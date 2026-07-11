@@ -3,45 +3,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Sparkles, BookOpen, Layers, CheckSquare, LogOut, LayoutDashboard, Menu, X, Sun, Moon, Laptop } from 'lucide-react';
+import { Sparkles, BookOpen, Layers, CheckSquare, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>('system');
 
-  React.useEffect(() => {
-    const saved = localStorage.getItem('studyvault_theme') as 'light' | 'dark' | 'system';
-    if (saved) {
-      setTimeout(() => {
-        setThemeState(saved);
-      }, 0);
-    }
-  }, []);
-
-  const changeTheme = (newTheme: 'light' | 'dark' | 'system') => {
-    setThemeState(newTheme);
-    localStorage.setItem('studyvault_theme', newTheme);
-    
-    const root = document.documentElement;
-    if (newTheme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else if (newTheme === 'light') {
-      root.classList.add('light');
-      root.classList.remove('dark');
-    } else {
-      root.classList.remove('light');
-      root.classList.remove('dark');
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        root.classList.add('dark');
-      } else {
-        root.classList.add('light');
-      }
-    }
-  };
 
   const handleLogout = async () => {
     try {
@@ -131,35 +101,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Theme Switcher Control */}
         <div className="px-4 py-3 border-t border-border/50 flex flex-col gap-2">
           <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Appearance</span>
-          <div className="grid grid-cols-3 gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
-            <button
-              onClick={() => changeTheme('light')}
-              className={`flex items-center justify-center p-2 rounded-lg transition-all cursor-pointer ${
-                theme === 'light' ? 'bg-card text-indigo-500 dark:text-indigo-400 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-              title="Light mode"
-            >
-              <Sun className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => changeTheme('dark')}
-              className={`flex items-center justify-center p-2 rounded-lg transition-all cursor-pointer ${
-                theme === 'dark' ? 'bg-card text-indigo-500 dark:text-indigo-400 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-              title="Dark mode"
-            >
-              <Moon className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => changeTheme('system')}
-              className={`flex items-center justify-center p-2 rounded-lg transition-all cursor-pointer ${
-                theme === 'system' ? 'bg-card text-indigo-500 dark:text-indigo-400 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-              title="System settings"
-            >
-              <Laptop className="h-4 w-4" />
-            </button>
-          </div>
+          <ThemeToggle />
         </div>
 
         {/* Logout Bottom Button */}

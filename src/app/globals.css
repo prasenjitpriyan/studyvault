@@ -150,3 +150,25 @@ body {
 .active-flip {
   transform: rotateY(180deg);
 }
+
+/* PDF Printing formatting */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  /* Hide all dashboard layouts, sidebar, headers and panels */
+  body > *:not(.print-area),
+  div:not(.print-area),
+  aside,
+  header,
+  nav,
+  button {
+    display: none !important;
+  }
+  .print-area,
+  .print-area * {
+    display: block !important;
+    visibility: visible !important;
+  }
+}

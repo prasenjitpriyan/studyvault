@@ -6,6 +6,7 @@ const NoteSchema = new Schema({
   content: { type: String, default: '' },
   folder: { type: String, default: 'General' },
   tags: { type: [String], default: [] },
+  isFavorite: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.models.Note || mongoose.model('Note', NoteSchema);

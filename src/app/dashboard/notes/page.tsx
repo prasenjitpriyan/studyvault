@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, Folder, Search, Plus, Trash2, Edit3, Eye, FileText, Tag, Loader2 } from 'lucide-react';
+import { BookOpen, Folder, Search, Plus, Trash2, Edit3, Eye, FileText, Tag, Loader2, Star, Volume2, VolumeX, Printer, Sparkles, Brain, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Note {
@@ -11,6 +11,7 @@ interface Note {
   folder: string;
   tags: string[];
   updatedAt: string;
+  isFavorite?: boolean;
 }
 
 export default function NotesPage() {
@@ -28,6 +29,17 @@ export default function NotesPage() {
   const [folderField, setFolderField] = useState('General');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+
+  // Extended Study Features State
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
+  const [aiSummary, setAiSummary] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiDecks, setAiDecks] = useState<{ _id: string; name: string }[]>([]);
+  const [selectedAiDeck, setSelectedAiDeck] = useState<string>('');
+  const [generatedCards, setGeneratedCards] = useState<{ front: string; back: string }[]>([]);
+  const [isGeneratingCards, setIsGeneratingCards] = useState(false);
+  const [isAiFlashcardsMode, setIsAiFlashcardsMode] = useState(false); // toggle drawer panel view
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -70,6 +82,225 @@ export default function NotesPage() {
       document.title = 'Notes Vault | StudyVault';
     }
   }, [activeNote]);
+
+  // Stop TTS voice speech cancellation when active note changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    const timer = setTimeout(() => {
+      setIsSpeaking(false);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [activeNote]);
+
+  // Load flashcard decks when AI drawer is opened
+  useEffect(() => {
+    if (aiDrawerOpen) {
+      const fetchDecks = async () => {
+        try {
+          const res = await fetch('/api/decks');
+          if (res.ok) {
+            const data = await res.json();
+            setAiDecks(data.decks || []);
+            if (data.decks && data.decks.length > 0) {
+              setSelectedAiDeck(data.decks[0]._id);
+            }
+          }
+        } catch {
+          console.error('Failed to load decks for AI generation.');
+        }
+      };
+      fetchDecks();
+    }
+  }, [aiDrawerOpen]);
+
+  // Toggle Favorite Status
+  const handleToggleFavorite = async (noteToToggle: Note) => {
+    const updatedStatus = !noteToToggle.isFavorite;
+    try {
+      const res = await fetch(`/api/notes/${noteToToggle._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isFavorite: updatedStatus }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setNotes((prevNotes) =>
+          prevNotes.map((n) => (n._id === noteToToggle._id ? data.note : n))
+        );
+        if (activeNote?._id === noteToToggle._id) {
+          setActiveNote(data.note);
+        }
+        toast.success(updatedStatus ? 'Added to favorites.' : 'Removed from favorites.');
+      }
+    } catch {
+      toast.error('Could not toggle favorite.');
+    }
+  };
+
+  // Text to Speech
+  const handleToggleSpeech = () => {
+    if (!activeNote || typeof window === 'undefined') return;
+
+    if (isSpeaking) {
+      window.speechSynthesis?.cancel();
+      setIsSpeaking(false);
+    } else {
+      // Clean up markdown tags for reading
+      const plainText = content
+        .replace(/#+\s+/g, '')
+        .replace(/\*\*|__|\*|_/g, '')
+        .replace(/`[^`]+`/g, '')
+        .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+
+      const utterance = new SpeechSynthesisUtterance(plainText || 'This note is empty.');
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      setIsSpeaking(true);
+      window.speechSynthesis?.speak(utterance);
+    }
+  };
+
+  // Print Note (PDF Export)
+  const handlePrintNote = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  };
+
+  // Local AI Note Summarization
+  const handleAISummarize = () => {
+    if (!content.trim()) {
+      toast.error('Write some notes first to summarize.');
+      return;
+    }
+    setIsAiLoading(true);
+    setIsAiFlashcardsMode(false);
+    setAiSummary('');
+
+    // Simulate local model latency
+    setTimeout(() => {
+      const sentences = content
+        .split(/[.!?\n]+/)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 12);
+
+      if (sentences.length === 0) {
+        setAiSummary('This note is too brief to generate a study summary. Add more detail!');
+        setIsAiLoading(false);
+        return;
+      }
+
+      const keywords = ['is', 'defines', 'important', 'key', 'remember', 'significant', 'concept', 'formula', 'process', 'result', 'study', 'note'];
+      const scored = sentences.map((s) => {
+        let score = 0;
+        keywords.forEach((kw) => {
+          if (s.toLowerCase().includes(kw)) score += 1;
+        });
+        return { sentence: s, score };
+      });
+
+      const topSentences = scored
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map((item) => `• ${item.sentence}.`);
+
+      setAiSummary(`Study Summary for "${title || 'Untitled Note'}":\n\n` + topSentences.join('\n'));
+      setIsAiLoading(false);
+      toast.success('Summary generated successfully.');
+    }, 1000);
+  };
+
+  // Local AI Flashcard Generation
+  const handleAIGenerateCards = () => {
+    if (!content.trim()) {
+      toast.error('Write some notes first to generate cards.');
+      return;
+    }
+    setIsAiLoading(true);
+    setIsAiFlashcardsMode(true);
+    setGeneratedCards([]);
+
+    // Simulate local model latency
+    setTimeout(() => {
+      const cards: { front: string; back: string }[] = [];
+      const lines = content.split('\n');
+
+      lines.forEach((line) => {
+        if (line.includes(' is ') || line.includes(' refers to ') || line.includes(' defines ')) {
+          const separator = line.includes(' is ') ? ' is ' : line.includes(' refers to ') ? ' refers to ' : ' defines ';
+          const parts = line.split(separator);
+          if (parts.length >= 2 && parts[0].trim().length > 2 && parts[1].trim().length > 5) {
+            const frontRaw = parts[0].replace(/[-*#]/g, '').trim();
+            const backRaw = parts[1].trim();
+            cards.push({
+              front: `What is ${frontRaw}?`,
+              back: backRaw.charAt(0).toUpperCase() + backRaw.slice(1),
+            });
+          }
+        }
+
+        if (line.toLowerCase().includes('q:') && line.toLowerCase().includes('a:')) {
+          const parts = line.split(/a:/i);
+          const qPart = parts[0].replace(/q:/i, '').trim();
+          const aPart = parts[1].trim();
+          if (qPart && aPart) {
+            cards.push({ front: qPart, back: aPart });
+          }
+        }
+      });
+
+      // Limit to 4 cards max
+      const finalCards = cards.slice(0, 4);
+
+      if (finalCards.length === 0) {
+        finalCards.push({
+          front: `Core concept of: ${title || 'Untitled Note'}`,
+          back: content.slice(0, 120) + (content.length > 120 ? '...' : ''),
+        });
+      }
+
+      setGeneratedCards(finalCards);
+      setIsAiLoading(false);
+      toast.success(`Generated ${finalCards.length} flashcard templates.`);
+    }, 1000);
+  };
+
+  // Save Generated Flashcards
+  const handleSaveGeneratedCards = async () => {
+    if (!selectedAiDeck) {
+      toast.error('Please create or select a study deck first.');
+      return;
+    }
+    if (generatedCards.length === 0) {
+      toast.error('No generated cards to save.');
+      return;
+    }
+
+    setIsGeneratingCards(true);
+    let successCount = 0;
+
+    try {
+      for (const card of generatedCards) {
+        const res = await fetch(`/api/decks/${selectedAiDeck}/flashcards`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(card),
+        });
+        if (res.ok) successCount++;
+      }
+      toast.success(`Successfully saved ${successCount} cards to selected deck!`);
+      setAiDrawerOpen(false);
+      setGeneratedCards([]);
+    } catch {
+      toast.error('Failed to save some cards.');
+    } finally {
+      setIsGeneratingCards(false);
+    }
+  };
 
   // Custom debounced autosave trigger
   const triggerAutosave = (updatedFields: Partial<Note>) => {
@@ -194,16 +425,25 @@ export default function NotesPage() {
   };
 
   // Get unique list of folders
-  const folders = ['All', ...Array.from(new Set(notes.map((n) => n.folder)))];
+  const folders = ['All', '⭐ Favorites', ...Array.from(new Set(notes.map((n) => n.folder)))];
 
   // Filter notes
   const filteredNotes = notes.filter((note) => {
-    const matchesFolder = selectedFolder === 'All' || note.folder === selectedFolder;
+    const matchesFolder =
+      selectedFolder === 'All' ||
+      (selectedFolder === '⭐ Favorites' ? note.isFavorite : note.folder === selectedFolder);
     const matchesSearch =
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesFolder && matchesSearch;
+  });
+
+  // Sort notes so favorites come first, then sorted by updatedAt
+  const sortedNotes = [...filteredNotes].sort((a, b) => {
+    if (a.isFavorite && !b.isFavorite) return -1;
+    if (!a.isFavorite && b.isFavorite) return 1;
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
   // Custom Markdown Parser
@@ -294,26 +534,38 @@ export default function NotesPage() {
             <div className="text-muted-foreground text-xs py-8 text-center flex flex-col items-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin text-indigo-400" /> Loading your notes...
             </div>
-          ) : filteredNotes.length === 0 ? (
+          ) : sortedNotes.length === 0 ? (
             <div className="text-muted-foreground text-xs py-8 text-center border border-dashed border-border rounded-xl m-2">
               No notes found.
             </div>
           ) : (
-            filteredNotes.map((note) => {
+            sortedNotes.map((note) => {
               const isActive = activeNote?._id === note._id;
               return (
                 <div
                   key={note._id}
                   onClick={() => selectNote(note)}
-                  className={`p-3.5 rounded-xl transition-all cursor-pointer border ${
+                  className={`p-3.5 rounded-xl transition-all cursor-pointer border relative group/item ${
                     isActive
                       ? 'bg-linear-to-r from-indigo-500/10 to-purple-500/5 border-indigo-500/20'
                       : 'bg-muted/10 hover:bg-muted/30 border-transparent'
                   }`}
                 >
-                  <h4 className={`text-xs font-semibold truncate ${isActive ? 'text-indigo-400 dark:text-indigo-300 font-bold' : 'text-foreground'}`}>
-                    {note.title || 'Untitled Note'}
-                  </h4>
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className={`text-xs font-semibold truncate ${isActive ? 'text-indigo-400 dark:text-indigo-300 font-bold' : 'text-foreground'} flex-1`}>
+                      {note.title || 'Untitled Note'}
+                    </h4>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleFavorite(note);
+                      }}
+                      className="p-0.5 rounded text-muted-foreground hover:text-amber-500 transition-colors"
+                      title={note.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                    >
+                      <Star className={`h-3.5 w-3.5 ${note.isFavorite ? 'fill-amber-500 text-amber-500' : 'opacity-40 group-hover/item:opacity-100'}`} />
+                    </button>
+                  </div>
                   <p className="text-[10px] text-muted-foreground truncate mt-1">
                     {note.content || 'Empty note...'}
                   </p>
@@ -385,6 +637,54 @@ export default function NotesPage() {
                   })}
                 </div>
 
+                {/* Favorite Star Toggle */}
+                <button
+                  onClick={() => handleToggleFavorite(activeNote)}
+                  className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                    activeNote.isFavorite
+                      ? 'bg-amber-500/15 border-amber-500/30 text-amber-500'
+                      : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                  }`}
+                  title={activeNote.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                >
+                  <Star className={`h-4 w-4 ${activeNote.isFavorite ? 'fill-amber-500' : ''}`} />
+                </button>
+
+                {/* Text-To-Speech Voice Reader */}
+                <button
+                  onClick={handleToggleSpeech}
+                  className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                    isSpeaking
+                      ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-400 dark:text-indigo-300'
+                      : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                  }`}
+                  title={isSpeaking ? 'Stop Reading' : 'Read Aloud'}
+                >
+                  {isSpeaking ? <VolumeX className="h-4 w-4 animate-pulse" /> : <Volume2 className="h-4 w-4" />}
+                </button>
+
+                {/* Print/Export to PDF */}
+                <button
+                  onClick={handlePrintNote}
+                  className="p-2 rounded-lg bg-muted border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+                  title="Export to PDF / Print"
+                >
+                  <Printer className="h-4 w-4" />
+                </button>
+
+                {/* AI Study Assistant Drawer Toggle */}
+                <button
+                  onClick={() => setAiDrawerOpen(!aiDrawerOpen)}
+                  className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                    aiDrawerOpen
+                      ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-400 dark:text-indigo-300'
+                      : 'bg-linear-to-r from-indigo-500/15 to-purple-500/15 border-indigo-500/20 text-indigo-500 hover:text-indigo-450 dark:hover:text-indigo-350'
+                  }`}
+                  title="AI Study Assistant"
+                >
+                  <Sparkles className="h-4 w-4" />
+                </button>
+
                 <button
                   onClick={handleDeleteNote}
                   className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
@@ -443,8 +743,17 @@ export default function NotesPage() {
 
             </div>
 
+            {/* Hidden Printing Canvas */}
+            <div className="hidden print:block print-area p-8 text-black bg-white">
+              <h1 className="text-3xl font-black mb-4 border-b border-zinc-200 pb-2">{title}</h1>
+              <div
+                className="prose max-w-none text-sm leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
+              />
+            </div>
+
             {/* Editor / Preview Content Canvas */}
-            <div className="flex-1 flex min-h-0">
+            <div className="flex-1 flex min-h-0 relative">
 
               {/* EDITOR AREA */}
               {(editMode === 'write' || editMode === 'both') && (
@@ -466,6 +775,135 @@ export default function NotesPage() {
                     className="prose dark:prose-invert max-w-none text-sm text-foreground leading-relaxed space-y-2 select-text"
                     dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
                   />
+                </div>
+              )}
+
+              {/* AI Study Assistant Drawer Overlay */}
+              {aiDrawerOpen && (
+                <div className="w-80 border-l border-border bg-card/95 backdrop-blur-md flex flex-col h-full z-20 absolute right-0 top-0 transition-all animate-in slide-in-from-right duration-300">
+                  <div className="p-4 border-b border-border/80 flex items-center justify-between">
+                    <h3 className="font-bold text-sm flex items-center gap-1.5 text-indigo-400 dark:text-indigo-300">
+                      <Brain className="h-4 w-4 text-purple-400" /> AI Study Assistant
+                    </h3>
+                    <button
+                      onClick={() => setAiDrawerOpen(false)}
+                      className="text-muted-foreground hover:text-foreground text-xs font-bold px-2 py-1 rounded bg-muted hover:bg-muted/80 cursor-pointer"
+                    >
+                      Close
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-none">
+                    {/* Action Hub */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAISummarize}
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          !isAiFlashcardsMode
+                            ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 dark:text-indigo-300'
+                            : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Summarize
+                      </button>
+                      <button
+                        onClick={handleAIGenerateCards}
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          isAiFlashcardsMode
+                            ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 dark:text-purple-300'
+                            : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Generate Cards
+                      </button>
+                    </div>
+
+                    {/* AI Loading State */}
+                    {isAiLoading && (
+                      <div className="py-8 text-center flex flex-col items-center gap-2 text-xs text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
+                        <span>AI model analyzing notes...</span>
+                      </div>
+                    )}
+
+                    {/* Summary Results View */}
+                    {!isAiLoading && !isAiFlashcardsMode && (
+                      <div className="space-y-3">
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Notes Summary</span>
+                        {aiSummary ? (
+                          <div className="p-3.5 bg-muted/40 border border-border/80 rounded-xl text-xs text-foreground leading-relaxed whitespace-pre-line">
+                            {aiSummary}
+                          </div>
+                        ) : (
+                          <div className="text-center py-6 border border-dashed border-border rounded-xl text-xs text-muted-foreground">
+                            Click &quot;Summarize&quot; above to generate a brief summary.
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Flashcard Generation View */}
+                    {!isAiLoading && isAiFlashcardsMode && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Target Study Deck</label>
+                          {aiDecks.length > 0 ? (
+                            <select
+                              value={selectedAiDeck}
+                              onChange={(e) => setSelectedAiDeck(e.target.value)}
+                              className="w-full p-2 bg-muted border border-border rounded-xl text-xs outline-none text-foreground cursor-pointer"
+                            >
+                              {aiDecks.map((d) => (
+                                <option key={d._id} value={d._id}>
+                                  {d.name}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <div className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
+                              No flashcard decks found. Please go to Flashcards tab to create a deck first!
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="space-y-3">
+                          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Generated Cards ({generatedCards.length})</span>
+                          {generatedCards.length > 0 ? (
+                            <div className="space-y-3">
+                              <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                                {generatedCards.map((card, idx) => (
+                                  <div key={idx} className="p-3 bg-muted/30 border border-border rounded-xl text-[11px] space-y-1">
+                                    <div className="font-semibold text-indigo-400">Front: <span className="text-foreground font-normal">{card.front}</span></div>
+                                    <div className="font-semibold text-purple-400">Back: <span className="text-foreground font-normal">{card.back}</span></div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <button
+                                onClick={handleSaveGeneratedCards}
+                                disabled={isGeneratingCards || !selectedAiDeck}
+                                className="w-full py-2.5 px-4 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                              >
+                                {isGeneratingCards ? (
+                                  <>
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check className="h-3.5 w-3.5" /> Save Cards to Deck
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="text-center py-6 border border-dashed border-border rounded-xl text-xs text-muted-foreground">
+                              Click &quot;Generate Cards&quot; above to parse flashcard Q&As.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

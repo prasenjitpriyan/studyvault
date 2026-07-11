@@ -22,7 +22,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { title, content, folder, tags } = body;
+    const { title, content, folder, tags, isFavorite } = body;
 
     await connectToDatabase();
     const note = await Note.findOne({ _id: id, userId });
@@ -35,6 +35,7 @@ export async function PUT(
     if (content !== undefined) note.content = content;
     if (folder !== undefined) note.folder = folder;
     if (tags !== undefined) note.tags = tags;
+    if (isFavorite !== undefined) note.isFavorite = isFavorite;
 
     await note.save();
 

@@ -10,12 +10,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('studyvault_theme') as 'light' | 'dark' | 'system') || 'system';
+  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>('system');
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('studyvault_theme') as 'light' | 'dark' | 'system';
+    if (saved) {
+      setTimeout(() => {
+        setThemeState(saved);
+      }, 0);
     }
-    return 'system';
-  });
+  }, []);
 
   const changeTheme = (newTheme: 'light' | 'dark' | 'system') => {
     setThemeState(newTheme);

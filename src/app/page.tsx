@@ -40,8 +40,8 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <main className="flex-1 flex flex-col items-center justify-center text-center px-6 max-w-5xl mx-auto z-10 py-12">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-semibold mb-6 animate-pulse">
-          <Sparkles className="h-3.5 w-3.5" /> Reimagining personal study productivity
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold tracking-wide mb-6 shadow-xs">
+          <Sparkles className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" /> Supercharge Your Study Flow
         </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight max-w-4xl">

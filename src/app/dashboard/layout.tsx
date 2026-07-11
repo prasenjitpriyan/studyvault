@@ -1,23 +1,43 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Sparkles, BookOpen, Layers, CheckSquare, LogOut, LayoutDashboard, Menu, X, User } from 'lucide-react';
+import { Sparkles, BookOpen, Layers, CheckSquare, LogOut, LayoutDashboard, Menu, X, Sun, Moon, Laptop } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [username, setUsername] = useState('Student');
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('studyvault_username');
-    if (storedUser) {
-      setTimeout(() => setUsername(storedUser), 0);
+  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('studyvault_theme') as 'light' | 'dark' | 'system') || 'system';
     }
-  }, []);
+    return 'system';
+  });
+
+  const changeTheme = (newTheme: 'light' | 'dark' | 'system') => {
+    setThemeState(newTheme);
+    localStorage.setItem('studyvault_theme', newTheme);
+    
+    const root = document.documentElement;
+    if (newTheme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else if (newTheme === 'light') {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    } else {
+      root.classList.remove('light');
+      root.classList.remove('dark');
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        root.classList.add('dark');
+      } else {
+        root.classList.add('light');
+      }
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -48,11 +68,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div className="flex h-screen bg-[#09090b] overflow-hidden text-zinc-100">
+    <div className="flex h-screen bg-background overflow-hidden text-foreground">
       <Toaster position="top-center" theme="dark" richColors />
 
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#0f0f17]/80 backdrop-blur-md border-b border-zinc-800 flex items-center justify-between px-6 z-30">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 z-30">
         <div className="flex items-center gap-2 font-bold text-lg">
           <div className="h-8 w-8 rounded-lg bg-linear-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md">
             <Sparkles className="h-4.5 w-4.5" />
@@ -61,7 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 text-zinc-400 hover:text-zinc-100 transition-colors"
+          className="p-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -69,31 +89,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Sidebar - Desktop & Mobile */}
       <aside
-        className={`fixed inset-y-0 left-0 z-20 flex flex-col w-64 bg-[#0f0f17]/90 backdrop-blur-xl border-r border-zinc-800/80 transition-transform duration-300 transform md:translate-x-0 md:static ${
+        className={`fixed inset-y-0 left-0 z-20 flex flex-col w-64 bg-card/90 backdrop-blur-xl border-r border-border/80 transition-transform duration-300 transform md:translate-x-0 md:static ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } pt-16 md:pt-0`}
       >
         {/* Brand logo - desktop only */}
-        <div className="hidden md:flex items-center gap-2 px-6 py-6 border-b border-zinc-800/50">
+        <div className="hidden md:flex items-center gap-2 px-6 py-6 border-b border-border/50">
           <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
             <Sparkles className="h-5 w-5" />
           </div>
           <span className="text-gradient font-extrabold text-lg tracking-tight">StudyVault</span>
         </div>
 
-        {/* User Card */}
-        <div className="px-4 py-6 border-b border-zinc-800/50 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">
-            <User className="h-5 w-5" />
-          </div>
-          <div className="overflow-hidden">
-            <h4 className="text-sm font-semibold truncate text-zinc-100">{username}</h4>
-            <p className="text-xs text-zinc-500 truncate">Active Learner</p>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        {/* Navigation list */}
+        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -104,22 +113,56 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-linear-to-r from-indigo-500/15 to-purple-500/5 border border-indigo-500/20 text-indigo-300'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50 border border-transparent'
+                    ? 'bg-linear-to-r from-indigo-500/15 to-purple-500/5 border border-indigo-500/20 text-indigo-400 dark:text-indigo-300'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent'
                 }`}
               >
-                <Icon className={`h-5 w-5 ${isActive ? 'text-indigo-400' : 'text-zinc-400'}`} />
+                <Icon className={`h-5 w-5 ${isActive ? 'text-indigo-500 dark:text-indigo-400' : 'text-muted-foreground'}`} />
                 {item.name}
               </Link>
             );
           })}
         </nav>
 
+        {/* Theme Switcher Control */}
+        <div className="px-4 py-3 border-t border-border/50 flex flex-col gap-2">
+          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Appearance</span>
+          <div className="grid grid-cols-3 gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
+            <button
+              onClick={() => changeTheme('light')}
+              className={`flex items-center justify-center p-2 rounded-lg transition-all cursor-pointer ${
+                theme === 'light' ? 'bg-card text-indigo-500 dark:text-indigo-400 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Light mode"
+            >
+              <Sun className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => changeTheme('dark')}
+              className={`flex items-center justify-center p-2 rounded-lg transition-all cursor-pointer ${
+                theme === 'dark' ? 'bg-card text-indigo-500 dark:text-indigo-400 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Dark mode"
+            >
+              <Moon className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => changeTheme('system')}
+              className={`flex items-center justify-center p-2 rounded-lg transition-all cursor-pointer ${
+                theme === 'system' ? 'bg-card text-indigo-500 dark:text-indigo-400 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="System settings"
+            >
+              <Laptop className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
         {/* Logout Bottom Button */}
-        <div className="p-4 border-t border-zinc-800/50">
+        <div className="p-4 border-t border-border/50">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-zinc-400 hover:text-zinc-100 hover:bg-red-500/10 hover:border-red-500/20 border border-transparent transition-all"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-transparent transition-all"
           >
             <LogOut className="h-5 w-5" />
             Logout

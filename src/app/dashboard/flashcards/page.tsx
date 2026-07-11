@@ -241,15 +241,15 @@ export default function FlashcardsPage() {
               <Loader2 className="h-6 w-6 animate-spin text-indigo-400" /> Loading study decks...
             </div>
           ) : decks.length === 0 ? (
-            <div className="text-center py-16 border border-dashed border-zinc-800 rounded-2xl max-w-md mx-auto">
-              <Layers className="h-12 w-12 text-zinc-700 mx-auto mb-4" />
-              <h3 className="font-bold text-zinc-300">No Decks Found</h3>
-              <p className="text-xs text-zinc-500 mt-1 max-w-xs mx-auto mb-5">
+            <div className="text-center py-16 border border-dashed border-border rounded-2xl max-w-md mx-auto">
+              <Layers className="h-12 w-12 text-border mx-auto mb-4" />
+              <h3 className="font-bold text-foreground">No Decks Found</h3>
+              <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto mb-5">
                 Create a flashcard deck to store questions, terms, and study formulas.
               </p>
               <button
                 onClick={() => setDeckModalOpen(true)}
-                className="bg-zinc-800 border border-zinc-750 text-xs px-4 py-2 rounded-lg font-semibold text-zinc-300 hover:text-zinc-100"
+                className="bg-card border border-border text-xs px-4 py-2 rounded-lg font-semibold text-foreground hover:bg-muted"
               >
                 Create Your First Deck
               </button>
@@ -259,28 +259,28 @@ export default function FlashcardsPage() {
               {decks.map((deck) => (
                 <div
                   key={deck._id}
-                  className="glass-panel p-6 rounded-2xl flex flex-col justify-between hover:border-zinc-750 transition-all relative group"
+                  className="glass-panel p-6 rounded-2xl flex flex-col justify-between hover:border-border transition-all relative group"
                 >
                   <div>
-                    <h3 className="text-md font-bold text-zinc-100 group-hover:text-indigo-400 transition-colors">
+                    <h3 className="text-md font-bold text-foreground group-hover:text-indigo-400 transition-colors">
                       {deck.name}
                     </h3>
-                    <p className="text-xs text-zinc-400 mt-2 line-clamp-2 min-h-8">
+                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2 min-h-8">
                       {deck.description || 'No description provided.'}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-zinc-850 mt-6 pt-4">
+                  <div className="flex items-center justify-between border-t border-border mt-6 pt-4">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSelectDeck(deck, 'practice')}
-                        className="text-xs bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 text-indigo-300 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer"
+                        className="text-xs bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 text-indigo-400 dark:text-indigo-300 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer"
                       >
                         Study
                       </button>
                       <button
                         onClick={() => handleSelectDeck(deck, 'manage')}
-                        className="text-xs bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer"
+                        className="text-xs bg-card border border-border hover:bg-muted text-muted-foreground px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer"
                       >
                         Cards
                       </button>
@@ -288,7 +288,7 @@ export default function FlashcardsPage() {
 
                     <button
                       onClick={(e) => handleDeleteDeck(deck._id, e)}
-                      className="p-1.5 rounded-lg bg-zinc-900/60 border border-transparent hover:border-red-500/20 hover:text-red-400 transition-all cursor-pointer"
+                      className="p-1.5 rounded-lg bg-muted/60 border border-transparent hover:border-red-500/20 hover:text-red-400 transition-all cursor-pointer"
                       title="Delete Deck"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -307,13 +307,13 @@ export default function FlashcardsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setViewMode('decks')}
-              className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-all cursor-pointer"
+              className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
             <div>
               <h2 className="text-xl font-bold">{activeDeck.name}</h2>
-              <p className="text-xs text-zinc-400">Practice Session &bull; Active Recall Mode</p>
+              <p className="text-xs text-muted-foreground">Practice Session &bull; Active Recall Mode</p>
             </div>
           </div>
 
@@ -324,8 +324,8 @@ export default function FlashcardsPage() {
           ) : practiceCards.length === 0 ? (
             <div className="text-center py-16 glass-panel rounded-2xl">
               <CheckCircle className="h-12 w-12 text-emerald-400 mx-auto mb-4" />
-              <h3 className="font-bold text-zinc-200">Deck Fully Reviewed!</h3>
-              <p className="text-xs text-zinc-500 mt-2 max-w-sm mx-auto mb-6 leading-relaxed">
+              <h3 className="font-bold text-foreground">Deck Fully Reviewed!</h3>
+              <p className="text-xs text-muted-foreground mt-2 max-w-sm mx-auto mb-6 leading-relaxed">
                 Awesome work! All cards in this deck are scheduled for a future review date.
               </p>
               <div className="flex justify-center gap-3">
@@ -337,7 +337,7 @@ export default function FlashcardsPage() {
                     setIsFlipped(false);
                   }}
                   disabled={flashcards.length === 0}
-                  className="bg-zinc-900 border border-zinc-800 text-xs px-4 py-2.5 rounded-lg text-zinc-300 hover:text-zinc-100 font-bold transition-all disabled:opacity-50"
+                  className="bg-card border border-border text-xs px-4 py-2.5 rounded-lg text-foreground hover:bg-muted font-bold transition-all disabled:opacity-50"
                 >
                   Re-Study All Cards ({flashcards.length})
                 </button>
@@ -352,7 +352,7 @@ export default function FlashcardsPage() {
           ) : (
             <div className="space-y-8">
               {/* Progress counter */}
-              <div className="flex justify-between items-center text-xs text-zinc-400 font-semibold px-1">
+              <div className="flex justify-between items-center text-xs text-muted-foreground font-semibold px-1">
                 <span>Card {currentCardIndex + 1} of {practiceCards.length}</span>
                 <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/15 px-2.5 py-0.5 rounded-full font-bold">
                   {practiceCards.length - currentCardIndex} Left
@@ -367,19 +367,19 @@ export default function FlashcardsPage() {
                 <div className={`w-full h-full relative transition-transform duration-500 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
 
                   {/* Front Side */}
-                  <div className="absolute inset-0 w-full h-full backface-hidden glass-panel rounded-2xl p-8 flex flex-col justify-between items-center text-center">
+                  <div className="absolute inset-0 w-full h-full backface-hidden glass-panel bg-card/40 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
                     <div className="flex-1 flex items-center justify-center">
-                      <p className="text-zinc-100 text-lg font-bold max-w-md wrap-break-word">{practiceCards[currentCardIndex]?.front}</p>
+                      <p className="text-foreground text-lg font-bold max-w-md wrap-break-word">{practiceCards[currentCardIndex]?.front}</p>
                     </div>
-                    <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold bg-zinc-900/80 px-3 py-1 rounded-full border border-zinc-850">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold bg-card/80 px-3 py-1 rounded-full border border-border">
                       Click to flip & view answer
                     </span>
                   </div>
 
                   {/* Back Side */}
-                  <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 glass-panel border-indigo-500/20 bg-zinc-950/20 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
+                  <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 glass-panel border-indigo-500/20 bg-card/40 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
                     <div className="flex-1 flex items-center justify-center">
-                      <p className="text-zinc-100 text-lg font-bold max-w-md wrap-break-word">{practiceCards[currentCardIndex]?.back}</p>
+                      <p className="text-foreground text-lg font-bold max-w-md wrap-break-word">{practiceCards[currentCardIndex]?.back}</p>
                     </div>
                     <span className="text-[10px] text-indigo-400/80 uppercase tracking-widest font-bold bg-indigo-500/5 px-3 py-1 rounded-full border border-indigo-500/10">
                       Answer Revealed
@@ -391,7 +391,7 @@ export default function FlashcardsPage() {
 
               {/* Active Recall Scheduler feedback buttons */}
               {isFlipped && (
-                <div className="flex justify-center gap-3 bg-zinc-900/30 border border-zinc-900 p-3 rounded-2xl animate-fade-in">
+                <div className="flex justify-center gap-3 bg-card/40 border border-border p-3 rounded-2xl animate-fade-in">
                   <button
                     onClick={() => handleGradeCard('hard')}
                     className="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-bold rounded-xl text-xs transition-all cursor-pointer"
@@ -424,20 +424,20 @@ export default function FlashcardsPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setViewMode('decks')}
-                className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-all cursor-pointer"
+                className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
               <div>
                 <h2 className="text-xl font-bold">{activeDeck.name}</h2>
-                <p className="text-xs text-zinc-400">Card Database &bull; {flashcards.length} cards</p>
+                <p className="text-xs text-muted-foreground">Card Database &bull; {flashcards.length} cards</p>
               </div>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => setViewMode('practice')}
-                className="bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-zinc-100 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                className="bg-muted border border-border text-foreground hover:bg-card font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
               >
                 Practice Deck
               </button>
@@ -456,14 +456,14 @@ export default function FlashcardsPage() {
             </div>
           ) : flashcards.length === 0 ? (
             <div className="text-center py-16 glass-panel rounded-2xl max-w-md mx-auto">
-              <HelpCircle className="h-12 w-12 text-zinc-700 mx-auto mb-4" />
-              <h3 className="font-bold text-zinc-300">No Cards Added</h3>
-              <p className="text-xs text-zinc-500 mt-1 max-w-xs mx-auto mb-5">
+              <HelpCircle className="h-12 w-12 text-border mx-auto mb-4" />
+              <h3 className="font-bold text-foreground">No Cards Added</h3>
+              <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto mb-5">
                 Add flashcards containing questions on the front and answers on the back.
               </p>
               <button
                 onClick={() => setCardModalOpen(true)}
-                className="bg-zinc-900 border border-zinc-800 text-xs px-4 py-2 rounded-lg font-semibold text-zinc-300 hover:text-zinc-100"
+                className="bg-card border border-border text-xs px-4 py-2 rounded-lg font-semibold text-foreground hover:bg-muted"
               >
                 Add First Card
               </button>
@@ -473,19 +473,19 @@ export default function FlashcardsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-zinc-900/60 text-zinc-400 font-bold border-b border-zinc-850">
+                    <tr className="bg-muted/60 text-muted-foreground font-bold border-b border-border">
                       <th className="p-4 w-[40%]">Front / Prompt</th>
                       <th className="p-4 w-[40%]">Back / Answer</th>
                       <th className="p-4 w-[15%]">Next Review</th>
                       <th className="p-4 w-[5%] text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-850/40">
+                  <tbody className="divide-y divide-border/40">
                     {flashcards.map((card) => (
-                      <tr key={card._id} className="hover:bg-zinc-900/20">
-                        <td className="p-4 font-medium text-zinc-300 break-all">{card.front}</td>
-                        <td className="p-4 text-zinc-400 break-all">{card.back}</td>
-                        <td className="p-4 text-zinc-500 whitespace-nowrap">
+                      <tr key={card._id} className="hover:bg-muted/10">
+                        <td className="p-4 font-medium text-foreground break-all">{card.front}</td>
+                        <td className="p-4 text-muted-foreground break-all">{card.back}</td>
+                        <td className="p-4 text-muted-foreground whitespace-nowrap">
                           {new Date(card.nextReview).toLocaleDateString()}
                         </td>
                         <td className="p-4 text-right">
@@ -510,29 +510,29 @@ export default function FlashcardsPage() {
       {/* --- MODAL: CREATE DECK --- */}
       {deckModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="w-full max-w-md bg-[#0f0f17] border border-zinc-800 rounded-2xl p-6 shadow-2xl relative">
+          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl relative">
             <h3 className="text-md font-bold mb-4">Create New Deck</h3>
             <form onSubmit={handleCreateDeck} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Deck Name</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Deck Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Physics Formulas, Spanish Vocabulary"
                   value={deckName}
                   onChange={(e) => setDeckName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-zinc-100"
+                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Description</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Description</label>
                 <textarea
                   placeholder="Summary of this deck..."
                   value={deckDesc}
                   onChange={(e) => setDeckDesc(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-zinc-100 resize-none"
+                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
                 />
               </div>
 
@@ -540,7 +540,7 @@ export default function FlashcardsPage() {
                 <button
                   type="button"
                   onClick={() => setDeckModalOpen(false)}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-200"
+                  className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
@@ -559,29 +559,29 @@ export default function FlashcardsPage() {
       {/* --- MODAL: ADD CARD --- */}
       {cardModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="w-full max-w-md bg-[#0f0f17] border border-zinc-800 rounded-2xl p-6 shadow-2xl relative">
+          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl relative">
             <h3 className="text-md font-bold mb-4">Add Flashcard</h3>
             <form onSubmit={handleCreateCard} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Front / Question</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Front / Question</label>
                 <textarea
                   placeholder="Type the front prompt or question..."
                   value={cardFront}
                   onChange={(e) => setCardFront(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-zinc-100 resize-none"
+                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Back / Answer</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Back / Answer</label>
                 <textarea
                   placeholder="Type the answer or details..."
                   value={cardBack}
                   onChange={(e) => setCardBack(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-zinc-100 resize-none"
+                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
                   required
                 />
               </div>
@@ -590,7 +590,7 @@ export default function FlashcardsPage() {
                 <button
                   type="button"
                   onClick={() => setCardModalOpen(false)}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-200"
+                  className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>

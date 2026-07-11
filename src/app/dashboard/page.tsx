@@ -213,15 +213,15 @@ export default function DashboardPage() {
             <Link
               key={idx}
               href={item.href}
-              className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:border-zinc-700 hover:scale-[1.01] transition-all cursor-pointer"
+              className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:border-border hover:scale-[1.01] transition-all cursor-pointer"
             >
               <div>
-                <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{item.name}</p>
-                <h3 className="text-3xl font-extrabold mt-2 text-zinc-100">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{item.name}</p>
+                <h3 className="text-3xl font-extrabold mt-2 text-foreground">
                   {isLoading ? '...' : item.value}
                 </h3>
               </div>
-              <div className={`h-12 w-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center ${item.color}`}>
+              <div className={`h-12 w-12 rounded-xl bg-card border border-border flex items-center justify-center ${item.color}`}>
                 <Icon className="h-6 w-6" />
               </div>
             </Link>
@@ -243,8 +243,8 @@ export default function DashboardPage() {
                 onClick={() => switchMode('work')}
                 className={`text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all ${
                   timerMode === 'work'
-                    ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300'
-                    : 'border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400 dark:text-indigo-300'
+                    : 'border-border text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Focus (25m)
@@ -253,8 +253,8 @@ export default function DashboardPage() {
                 onClick={() => switchMode('break')}
                 className={`text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all ${
                   timerMode === 'break'
-                    ? 'bg-purple-500/10 border-purple-500/20 text-purple-300'
-                    : 'border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-purple-500/10 border-purple-500/20 text-purple-400 dark:text-purple-300'
+                    : 'border-border text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Break (5m)
@@ -267,7 +267,7 @@ export default function DashboardPage() {
             <div className="text-7xl md:text-8xl font-black font-mono tracking-tight mb-2 text-gradient">
               {String(timerMinutes).padStart(2, '0')}:{String(timerSeconds).padStart(2, '0')}
             </div>
-            <p className="text-xs text-zinc-400 mb-8 uppercase tracking-widest font-semibold">
+            <p className="text-xs text-muted-foreground mb-8 uppercase tracking-widest font-semibold">
               {timerMode === 'work' ? 'Time to Focus' : 'Take a Break'}
             </p>
 
@@ -289,7 +289,7 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={resetTimer}
-                className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-5 py-3.5 rounded-xl transition-all"
+                className="bg-card hover:bg-muted border border-border text-foreground px-5 py-3.5 rounded-xl transition-all"
               >
                 <RotateCcw className="h-5 w-5" />
               </button>
@@ -297,7 +297,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Simple Progress Bar */}
-          <div className="w-full bg-zinc-900 h-1.5 rounded-full mt-6 overflow-hidden border border-zinc-800/50">
+          <div className="w-full bg-muted h-1.5 rounded-full mt-6 overflow-hidden border border-border/50">
             <div
               className="bg-linear-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
@@ -321,9 +321,9 @@ export default function DashboardPage() {
 
             <div className="space-y-3">
               {isLoading ? (
-                <div className="text-sm text-zinc-500 py-3 text-center">Loading notes...</div>
+                <div className="text-sm text-muted-foreground py-3 text-center">Loading notes...</div>
               ) : recentNotes.length === 0 ? (
-                <div className="text-sm text-zinc-500 py-6 text-center border border-dashed border-zinc-800 rounded-xl">
+                <div className="text-sm text-muted-foreground py-6 text-center border border-dashed border-border rounded-xl">
                   No notes created yet.
                   <Link href="/dashboard/notes" className="text-indigo-400 hover:underline block text-xs mt-2 font-semibold">
                     Create your first note
@@ -334,14 +334,14 @@ export default function DashboardPage() {
                   <Link
                     key={note._id}
                     href="/dashboard/notes"
-                    className="block p-3.5 bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-800/40 hover:border-zinc-800 rounded-xl transition-all"
+                    className="block p-3.5 bg-muted/20 hover:bg-muted/50 border border-border/40 hover:border-border rounded-xl transition-all"
                   >
-                    <h4 className="text-sm font-semibold truncate text-zinc-200">{note.title}</h4>
+                    <h4 className="text-sm font-semibold truncate text-foreground">{note.title}</h4>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-[10px] bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full font-medium">
                         {note.folder}
                       </span>
-                      <span className="text-[10px] text-zinc-500">
+                      <span className="text-[10px] text-muted-foreground">
                         {new Date(note.updatedAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -364,9 +364,9 @@ export default function DashboardPage() {
 
             <div className="space-y-3">
               {isLoading ? (
-                <div className="text-sm text-zinc-500 py-3 text-center">Loading tasks...</div>
+                <div className="text-sm text-muted-foreground py-3 text-center">Loading tasks...</div>
               ) : pendingTasks.length === 0 ? (
-                <div className="text-sm text-zinc-500 py-6 text-center border border-dashed border-zinc-800 rounded-xl">
+                <div className="text-sm text-muted-foreground py-6 text-center border border-dashed border-border rounded-xl">
                   All caught up! No tasks left.
                   <Link href="/dashboard/tasks" className="text-indigo-400 hover:underline block text-xs mt-2 font-semibold">
                     Add a new task
@@ -376,12 +376,12 @@ export default function DashboardPage() {
                 pendingTasks.map((task) => (
                   <div
                     key={task._id}
-                    className="p-3.5 bg-zinc-900/50 border border-zinc-800/40 rounded-xl flex items-center justify-between"
+                    className="p-3.5 bg-muted/20 border border-border/40 rounded-xl flex items-center justify-between"
                   >
                     <div className="overflow-hidden mr-3">
-                      <h4 className="text-sm font-medium truncate text-zinc-200">{task.title}</h4>
+                      <h4 className="text-sm font-medium truncate text-foreground">{task.title}</h4>
                       {task.dueDate && (
-                        <p className="text-[10px] text-zinc-500 mt-1">
+                        <p className="text-[10px] text-muted-foreground mt-1">
                           Due: {new Date(task.dueDate).toLocaleDateString()}
                         </p>
                       )}
@@ -392,7 +392,7 @@ export default function DashboardPage() {
                           ? 'bg-red-500/10 border border-red-500/20 text-red-400'
                           : task.priority === 'medium'
                           ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
-                          : 'bg-zinc-500/10 border border-zinc-700 text-zinc-400'
+                          : 'bg-muted border border-border text-muted-foreground'
                       }`}
                     >
                       {task.priority}

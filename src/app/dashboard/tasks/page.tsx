@@ -147,16 +147,16 @@ export default function TasksPage() {
 
           {/* TO DO COLUMN */}
           <div className="flex flex-col space-y-4">
-            <div className="flex justify-between items-center bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl">
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-widest">To Do</span>
-              <span className="bg-zinc-800 text-zinc-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            <div className="flex justify-between items-center bg-card border border-border p-3 rounded-xl">
+              <span className="text-xs font-bold text-foreground uppercase tracking-widest">To Do</span>
+              <span className="bg-muted text-muted-foreground text-[10px] font-bold px-2 py-0.5 rounded-full">
                 {todoTasks.length}
               </span>
             </div>
 
-            <div className="space-y-3 flex-1 min-h-60 bg-zinc-950/20 p-2.5 rounded-2xl border border-zinc-900 border-dashed">
+            <div className="space-y-3 flex-1 min-h-60 bg-muted/10 p-2.5 rounded-2xl border border-border border-dashed">
               {todoTasks.length === 0 ? (
-                <div className="text-center py-8 text-xs text-zinc-600">No tasks in queue.</div>
+                <div className="text-center py-8 text-xs text-muted-foreground">No tasks in queue.</div>
               ) : (
                 todoTasks.map((task) => (
                   <TaskCard
@@ -173,16 +173,16 @@ export default function TasksPage() {
 
           {/* IN PROGRESS COLUMN */}
           <div className="flex flex-col space-y-4">
-            <div className="flex justify-between items-center bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl">
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-widest">In Progress</span>
-              <span className="bg-zinc-800 text-zinc-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            <div className="flex justify-between items-center bg-card border border-border p-3 rounded-xl">
+              <span className="text-xs font-bold text-foreground uppercase tracking-widest">In Progress</span>
+              <span className="bg-muted text-muted-foreground text-[10px] font-bold px-2 py-0.5 rounded-full">
                 {inProgressTasks.length}
               </span>
             </div>
 
-            <div className="space-y-3 flex-1 min-h-60 bg-zinc-950/20 p-2.5 rounded-2xl border border-zinc-900 border-dashed">
+            <div className="space-y-3 flex-1 min-h-60 bg-muted/10 p-2.5 rounded-2xl border border-border border-dashed">
               {inProgressTasks.length === 0 ? (
-                <div className="text-center py-8 text-xs text-zinc-600">No tasks active.</div>
+                <div className="text-center py-8 text-xs text-muted-foreground">No tasks active.</div>
               ) : (
                 inProgressTasks.map((task) => (
                   <TaskCard
@@ -200,16 +200,16 @@ export default function TasksPage() {
 
           {/* COMPLETED COLUMN */}
           <div className="flex flex-col space-y-4">
-            <div className="flex justify-between items-center bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl">
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-widest">Completed</span>
-              <span className="bg-zinc-800 text-zinc-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            <div className="flex justify-between items-center bg-card border border-border p-3 rounded-xl">
+              <span className="text-xs font-bold text-foreground uppercase tracking-widest">Completed</span>
+              <span className="bg-muted text-muted-foreground text-[10px] font-bold px-2 py-0.5 rounded-full">
                 {doneTasks.length}
               </span>
             </div>
 
-            <div className="space-y-3 flex-1 min-h-60 bg-zinc-950/20 p-2.5 rounded-2xl border border-zinc-900 border-dashed">
+            <div className="space-y-3 flex-1 min-h-60 bg-muted/10 p-2.5 rounded-2xl border border-border border-dashed">
               {doneTasks.length === 0 ? (
-                <div className="text-center py-8 text-xs text-zinc-600">No completed tasks yet.</div>
+                <div className="text-center py-8 text-xs text-muted-foreground">No completed tasks yet.</div>
               ) : (
                 doneTasks.map((task) => (
                   <TaskCard
@@ -303,15 +303,15 @@ interface TaskCardProps {
 
 function TaskCard({ task, isOverdue, onMoveLeft, onMoveRight, onDelete }: TaskCardProps) {
   return (
-    <div className="glass-panel p-4 rounded-xl flex flex-col justify-between space-y-4 hover:border-zinc-800 transition-all">
+    <div className="glass-panel p-4 rounded-xl flex flex-col justify-between space-y-4 hover:border-border transition-all">
       <div>
         <div className="flex justify-between items-start gap-2">
-          <h4 className={`text-xs font-semibold text-zinc-200 wrap-break-word leading-relaxed ${task.status === 'done' ? 'line-through text-zinc-500' : ''}`}>
+          <h4 className={`text-xs font-semibold text-foreground wrap-break-word leading-relaxed ${task.status === 'done' ? 'line-through text-muted-foreground' : ''}`}>
             {task.title}
           </h4>
           <button
             onClick={onDelete}
-            className="text-zinc-500 hover:text-red-400 transition-all p-1 hover:bg-zinc-900 rounded-lg cursor-pointer"
+            className="text-muted-foreground hover:text-red-400 transition-all p-1 hover:bg-muted rounded-lg cursor-pointer"
             title="Delete Task"
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -321,8 +321,8 @@ function TaskCard({ task, isOverdue, onMoveLeft, onMoveRight, onDelete }: TaskCa
         {/* Due date notice */}
         {task.dueDate && (
           <div className="flex items-center gap-1.5 mt-2">
-            <Calendar className={`h-3 w-3 ${isOverdue ? 'text-red-400 animate-pulse' : 'text-zinc-500'}`} />
-            <span className={`text-[10px] ${isOverdue ? 'text-red-400 font-bold' : 'text-zinc-500'}`}>
+            <Calendar className={`h-3 w-3 ${isOverdue ? 'text-red-400 animate-pulse' : 'text-muted-foreground'}`} />
+            <span className={`text-[10px] ${isOverdue ? 'text-red-400 font-bold' : 'text-muted-foreground'}`}>
               {new Date(task.dueDate).toLocaleDateString()}
               {isOverdue && ' (Overdue)'}
             </span>
@@ -331,14 +331,14 @@ function TaskCard({ task, isOverdue, onMoveLeft, onMoveRight, onDelete }: TaskCa
       </div>
 
       {/* Footer controls & priority badge */}
-      <div className="flex items-center justify-between border-t border-zinc-850 pt-3">
+      <div className="flex items-center justify-between border-t border-border pt-3">
         <span
           className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
             task.priority === 'high'
               ? 'bg-red-500/10 border border-red-500/20 text-red-400 shadow-md shadow-red-500/5'
               : task.priority === 'medium'
               ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
-              : 'bg-zinc-800 border border-zinc-750 text-zinc-400'
+              : 'bg-muted border border-border text-muted-foreground'
           }`}
         >
           {task.priority}
@@ -349,7 +349,7 @@ function TaskCard({ task, isOverdue, onMoveLeft, onMoveRight, onDelete }: TaskCa
           {onMoveLeft && (
             <button
               onClick={onMoveLeft}
-              className="p-1 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:text-zinc-200 text-zinc-500 transition-all cursor-pointer"
+              className="p-1 rounded bg-card border border-border hover:border-border hover:text-foreground text-muted-foreground transition-all cursor-pointer"
               title="Move Left"
             >
               <ArrowLeft className="h-3 w-3" />
@@ -358,7 +358,7 @@ function TaskCard({ task, isOverdue, onMoveLeft, onMoveRight, onDelete }: TaskCa
           {onMoveRight && (
             <button
               onClick={onMoveRight}
-              className="p-1 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:text-zinc-200 text-zinc-500 transition-all cursor-pointer"
+              className="p-1 rounded bg-card border border-border hover:border-border hover:text-foreground text-muted-foreground transition-all cursor-pointer"
               title="Move Right"
             >
               <ArrowRight className="h-3 w-3" />

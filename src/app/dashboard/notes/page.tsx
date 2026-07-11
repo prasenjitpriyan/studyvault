@@ -260,27 +260,27 @@ export default function NotesPage() {
 
           {/* Search bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search title, content, tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-800 focus:border-zinc-700 rounded-xl outline-none text-xs text-zinc-300"
+              className="w-full pl-9 pr-4 py-2 bg-card border border-border focus:border-indigo-500 rounded-xl outline-none text-xs text-foreground"
             />
           </div>
         </div>
 
         {/* Folders List Row */}
-        <div className="px-4 py-2 border-b border-zinc-850 overflow-x-auto flex gap-1.5 scrollbar-none">
+        <div className="px-4 py-2 border-b border-border overflow-x-auto flex gap-1.5 scrollbar-none">
           {folders.map((f) => (
             <button
               key={f}
               onClick={() => setSelectedFolder(f)}
               className={`text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap transition-all border ${
                 selectedFolder === f
-                  ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 dark:text-indigo-300'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground'
               }`}
             >
               {f}
@@ -291,11 +291,11 @@ export default function NotesPage() {
         {/* Notes Items Directory */}
         <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
           {isLoading ? (
-            <div className="text-zinc-500 text-xs py-8 text-center flex flex-col items-center gap-2">
+            <div className="text-muted-foreground text-xs py-8 text-center flex flex-col items-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin text-indigo-400" /> Loading your notes...
             </div>
           ) : filteredNotes.length === 0 ? (
-            <div className="text-zinc-500 text-xs py-8 text-center border border-dashed border-zinc-800 rounded-xl m-2">
+            <div className="text-muted-foreground text-xs py-8 text-center border border-dashed border-border rounded-xl m-2">
               No notes found.
             </div>
           ) : (
@@ -308,20 +308,20 @@ export default function NotesPage() {
                   className={`p-3.5 rounded-xl transition-all cursor-pointer border ${
                     isActive
                       ? 'bg-linear-to-r from-indigo-500/10 to-purple-500/5 border-indigo-500/20'
-                      : 'bg-zinc-900/30 hover:bg-zinc-900/60 border-transparent'
+                      : 'bg-muted/10 hover:bg-muted/30 border-transparent'
                   }`}
                 >
-                  <h4 className={`text-xs font-semibold truncate ${isActive ? 'text-indigo-300 font-bold' : 'text-zinc-300'}`}>
+                  <h4 className={`text-xs font-semibold truncate ${isActive ? 'text-indigo-400 dark:text-indigo-300 font-bold' : 'text-foreground'}`}>
                     {note.title || 'Untitled Note'}
                   </h4>
-                  <p className="text-[10px] text-zinc-500 truncate mt-1">
+                  <p className="text-[10px] text-muted-foreground truncate mt-1">
                     {note.content || 'Empty note...'}
                   </p>
                   <div className="flex items-center justify-between mt-2.5">
-                    <span className="text-[9px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded font-mono">
+                    <span className="text-[9px] bg-muted border border-border text-muted-foreground px-1.5 py-0.5 rounded font-mono">
                       {note.folder}
                     </span>
-                    <span className="text-[9px] text-zinc-500">
+                    <span className="text-[9px] text-muted-foreground">
                       {new Date(note.updatedAt).toLocaleDateString()}
                     </span>
                   </div>
@@ -337,23 +337,23 @@ export default function NotesPage() {
         {activeNote ? (
           <>
             {/* Editor Actions Header */}
-            <div className="p-4 border-b border-zinc-800/80 flex items-center justify-between flex-wrap gap-3">
+            <div className="p-4 border-b border-border/80 flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">
                 <input
                   type="text"
                   value={title}
                   onChange={handleTitleChange}
                   placeholder="Note Title"
-                  className="bg-transparent text-lg font-bold border-none outline-none text-zinc-100 focus:ring-0 w-64 md:w-80"
+                  className="bg-transparent text-lg font-bold border-none outline-none text-foreground focus:ring-0 w-64 md:w-80"
                 />
 
                 {/* Autosave Status Badge */}
                 {isSaving ? (
-                  <span className="flex items-center gap-1 text-[10px] text-zinc-500 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-850">
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground bg-card px-2.5 py-1 rounded-full border border-border">
                     <Loader2 className="h-3 w-3 animate-spin text-indigo-400" /> Saving
                   </span>
                 ) : (
-                  <span className="text-[10px] text-zinc-500 bg-zinc-900/50 px-2.5 py-1 rounded-full border border-zinc-850">
+                  <span className="text-[10px] text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
                     Saved
                   </span>
                 )}
@@ -361,7 +361,7 @@ export default function NotesPage() {
 
               {/* View options */}
               <div className="flex items-center gap-3">
-                <div className="flex rounded-lg bg-zinc-900 border border-zinc-800 p-0.5">
+                <div className="flex rounded-lg bg-muted border border-border p-0.5">
                   {[
                     { mode: 'write', label: 'Edit', icon: Edit3 },
                     { mode: 'preview', label: 'Preview', icon: Eye },
@@ -374,8 +374,8 @@ export default function NotesPage() {
                         onClick={() => setEditMode(btn.mode as 'write' | 'preview' | 'both')}
                         className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all ${
                           editMode === btn.mode
-                            ? 'bg-zinc-800 text-zinc-200 shadow-md'
-                            : 'text-zinc-500 hover:text-zinc-300'
+                            ? 'bg-card text-foreground shadow-md'
+                            : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         <Icon className="h-3.5 w-3.5" />
@@ -396,25 +396,25 @@ export default function NotesPage() {
             </div>
 
             {/* Note Meta Subheader (Folder & Tags) */}
-            <div className="px-6 py-3 border-b border-zinc-850 bg-zinc-900/20 flex flex-wrap items-center gap-4 text-xs">
+            <div className="px-6 py-3 border-b border-border/80 bg-muted/10 flex flex-wrap items-center gap-4 text-xs">
 
               {/* Folder edit */}
               <div className="flex items-center gap-2">
-                <Folder className="h-3.5 w-3.5 text-zinc-500" />
-                <span className="text-zinc-400">Folder:</span>
+                <Folder className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Folder:</span>
                 <input
                   type="text"
                   value={folderField}
                   onChange={handleFolderChange}
                   placeholder="General"
-                  className="bg-transparent border-b border-transparent hover:border-zinc-700 focus:border-indigo-500 outline-none text-zinc-200 px-1 py-0.5 transition-all w-24"
+                  className="bg-transparent border-b border-transparent hover:border-border focus:border-indigo-500 outline-none text-foreground px-1 py-0.5 transition-all w-24"
                 />
               </div>
 
               {/* Tags list and input */}
               <div className="flex items-center gap-2 flex-wrap">
-                <Tag className="h-3.5 w-3.5 text-zinc-500" />
-                <span className="text-zinc-400">Tags:</span>
+                <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Tags:</span>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {tags.map((tag) => (
                     <span
@@ -436,7 +436,7 @@ export default function NotesPage() {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleAddTag}
                     placeholder="+ Add tag..."
-                    className="bg-transparent outline-none text-zinc-300 w-20 text-[11px]"
+                    className="bg-transparent outline-none text-foreground w-20 text-[11px]"
                   />
                 </div>
               </div>
@@ -452,18 +452,18 @@ export default function NotesPage() {
                   value={content}
                   onChange={handleContentChange}
                   placeholder="Write your study notes in markdown format (# headers, **bold**, *italics*, - bullet points...)"
-                  className="flex-1 h-full p-6 bg-zinc-950/20 text-zinc-200 outline-none border-none resize-none font-mono text-sm leading-relaxed focus:ring-0 focus:outline-none"
+                  className="flex-1 h-full p-6 bg-muted/5 text-foreground outline-none border-none resize-none font-mono text-sm leading-relaxed focus:ring-0 focus:outline-none"
                 />
               )}
 
               {/* SPLIT SPLITTER BAR */}
-              {editMode === 'both' && <div className="w-px bg-zinc-800" />}
+              {editMode === 'both' && <div className="w-px bg-border" />}
 
               {/* LIVE PREVIEW AREA */}
               {(editMode === 'preview' || editMode === 'both') && (
-                <div className="flex-1 h-full p-6 overflow-y-auto bg-zinc-950/5 select-text">
+                <div className="flex-1 h-full p-6 overflow-y-auto bg-muted/5 select-text">
                   <div
-                    className="prose prose-invert max-w-none text-sm text-zinc-300 leading-relaxed space-y-2 select-text"
+                    className="prose dark:prose-invert max-w-none text-sm text-foreground leading-relaxed space-y-2 select-text"
                     dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
                   />
                 </div>
@@ -472,10 +472,10 @@ export default function NotesPage() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-zinc-500 p-8">
-            <BookOpen className="h-12 w-12 text-zinc-700 mb-4 animate-bounce" />
-            <h3 className="text-zinc-400 font-bold mb-1">No Note Selected</h3>
-            <p className="text-xs text-zinc-500 mb-6 text-center max-w-xs">
+          <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8">
+            <BookOpen className="h-12 w-12 text-border mb-4 animate-bounce" />
+            <h3 className="text-muted-foreground font-bold mb-1">No Note Selected</h3>
+            <p className="text-xs text-muted-foreground mb-6 text-center max-w-xs">
               Select an existing note from the directory or create a brand new one.
             </p>
             <button

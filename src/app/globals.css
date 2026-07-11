@@ -21,6 +21,38 @@
   --input: #27272a;
   --ring: #6366f1;
   --radius: 0.75rem;
+
+  --glass-bg: rgba(15, 15, 23, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --gradient-from: #a5b4fc;
+  --gradient-to: #c084fc;
+}
+
+.light {
+  --background: #fcfcfd;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #09090b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #7c3aed;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #4f46e5;
+
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --gradient-from: #4f46e5;
+  --gradient-to: #9333ea;
 }
 
 @theme {
@@ -61,21 +93,21 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--muted-foreground);
 }
 
 /* Smooth active components transitions */
 .glass-panel {
-  background: rgba(15, 15, 23, 0.7);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
 }
 
 .glass-card-hover:hover {
@@ -86,7 +118,7 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%);
+  background: linear-gradient(135deg, var(--gradient-from) 0%, var(--gradient-to) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

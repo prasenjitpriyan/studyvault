@@ -62,6 +62,15 @@ export default function NotesPage() {
     fetchNotes();
   }, [activeNote]);
 
+  // Dynamically update document title to reflect active note
+  useEffect(() => {
+    if (activeNote) {
+      document.title = `${activeNote.title} | StudyVault`;
+    } else {
+      document.title = 'Notes Vault | StudyVault';
+    }
+  }, [activeNote]);
+
   // Custom debounced autosave trigger
   const triggerAutosave = (updatedFields: Partial<Note>) => {
     if (!activeNote) return;

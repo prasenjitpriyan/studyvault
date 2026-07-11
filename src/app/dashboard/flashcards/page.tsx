@@ -89,6 +89,15 @@ export default function FlashcardsPage() {
     fetchFlashcards(deck._id);
   };
 
+  // Dynamically update document title to reflect active deck name
+  useEffect(() => {
+    if (activeDeck) {
+      document.title = `${activeDeck.name} | StudyVault`;
+    } else {
+      document.title = 'Flashcard Decks | StudyVault';
+    }
+  }, [activeDeck]);
+
   // Create Deck
   const handleCreateDeck = async (e: React.FormEvent) => {
     e.preventDefault();

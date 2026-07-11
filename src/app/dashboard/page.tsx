@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { BookOpen, Layers, CheckSquare, Play, Pause, RotateCcw, Clock, ArrowRight, Timer } from 'lucide-react';
 import { toast } from 'sonner';
+import { gsap } from 'gsap';
 
 interface DashboardStats {
   notesCount: number;
@@ -27,6 +28,7 @@ interface PendingTask {
 }
 
 export default function DashboardPage() {
+  const dashboardRef = useRef<HTMLDivElement>(null);
   const [stats, setStats] = useState<DashboardStats>({
     notesCount: 0,
     decksCount: 0,
@@ -99,6 +101,61 @@ export default function DashboardPage() {
 
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline();
+
+      tl.fromTo('.gsap-dash-header',
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+      );
+
+      tl.fromTo('.gsap-dash-stat',
+        { opacity: 0, y: 20, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.4, stagger: 0.08, ease: 'back.out(1.2)' },
+        '-=0.3'
+      );
+
+      tl.fromTo('.gsap-dash-timer',
+        { opacity: 0, x: -30 },
+        { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' },
+        '-=0.2'
+      );
+
+      tl.fromTo('.gsap-dash-sidebar-panel',
+        { opacity: 0, x: 30 },
+        { opacity: 1, x: 0, duration: 0.6, stagger: 0.12, ease: 'power3.out' },
+        '-=0.4'
+      );
+
+      // Add interactive hover transforms to stats cards
+      const statsCards = gsap.utils.toArray('.gsap-dash-stat') as HTMLElement[];
+      statsCards.forEach((card) => {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, { y: -4, scale: 1.015, borderColor: 'rgba(99, 102, 241, 0.4)', boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.1)', duration: 0.25, ease: 'power2.out' });
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, { y: 0, scale: 1, borderColor: '', boxShadow: '', duration: 0.25, ease: 'power2.out' });
+        });
+      });
+
+      // Add interactive hover to list items
+      const listItems = gsap.utils.toArray('.gsap-dash-item') as HTMLElement[];
+      listItems.forEach((item) => {
+        item.addEventListener('mouseenter', () => {
+          gsap.to(item, { x: 4, backgroundColor: 'rgba(255, 255, 255, 0.03)', duration: 0.2, ease: 'power2.out' });
+        });
+        item.addEventListener('mouseleave', () => {
+          gsap.to(item, { x: 0, backgroundColor: '', duration: 0.2, ease: 'power2.out' });
+        });
+      });
+    }, dashboardRef);
+
+    return () => ctx.revert();
+  }, [isLoading]);
 
   const playBeep = () => {
     try {
@@ -193,9 +250,9 @@ export default function DashboardPage() {
   const progressPercent = ((initialTime - totalSecondsRemaining) / initialTime) * 100;
 
   return (
-    <div className="space-y-8">
+    <div ref={dashboardRef} className="space-y-8">
       {/* Header Greeting */}
-      <div>
+      <div className="gsap-dash-header">
         <h1 className="text-3xl font-extrabold tracking-tight">Study Dashboard</h1>
         <p className="text-sm text-zinc-400 mt-1">Review your statistics, manage goals, and start a study timer.</p>
       </div>
@@ -213,7 +270,7 @@ export default function DashboardPage() {
             <Link
               key={idx}
               href={item.href}
-              className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:border-border hover:scale-[1.01] transition-all cursor-pointer"
+              className="gsap-dash-stat glass-panel p-6 rounded-2xl flex items-center justify-between border border-border/40 cursor-pointer"
             >
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{item.name}</p>
@@ -233,7 +290,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Pomodoro Focus Timer Panel (Takes 2 Columns on desktop) */}
-        <div className="lg:col-span-2 glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
+        <div className="gsap-dash-timer lg:col-span-2 glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <Clock className="h-5 w-5 text-indigo-400" /> Focus Session
@@ -309,7 +366,7 @@ export default function DashboardPage() {
         <div className="space-y-6">
 
           {/* Recent Notes Panel */}
-          <div className="glass-panel rounded-2xl p-6 space-y-4">
+          <div className="gsap-dash-sidebar-panel glass-panel rounded-2xl p-6 space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-md font-bold flex items-center gap-2">
                 <BookOpen className="h-4.5 w-4.5 text-indigo-400" /> Recent Notes
@@ -334,7 +391,7 @@ export default function DashboardPage() {
                   <Link
                     key={note._id}
                     href="/dashboard/notes"
-                    className="block p-3.5 bg-muted/20 hover:bg-muted/50 border border-border/40 hover:border-border rounded-xl transition-all"
+                    className="gsap-dash-item block p-3.5 bg-muted/20 border border-border/40 rounded-xl"
                   >
                     <h4 className="text-sm font-semibold truncate text-foreground">{note.title}</h4>
                     <div className="flex items-center justify-between mt-2">
@@ -352,7 +409,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Pending Tasks Panel */}
-          <div className="glass-panel rounded-2xl p-6 space-y-4">
+          <div className="gsap-dash-sidebar-panel glass-panel rounded-2xl p-6 space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-md font-bold flex items-center gap-2">
                 <CheckSquare className="h-4.5 w-4.5 text-indigo-400" /> Pending Tasks
@@ -376,7 +433,7 @@ export default function DashboardPage() {
                 pendingTasks.map((task) => (
                   <div
                     key={task._id}
-                    className="p-3.5 bg-muted/20 border border-border/40 rounded-xl flex items-center justify-between"
+                    className="gsap-dash-item p-3.5 bg-muted/20 border border-border/40 rounded-xl flex items-center justify-between"
                   >
                     <div className="overflow-hidden mr-3">
                       <h4 className="text-sm font-medium truncate text-foreground">{task.title}</h4>

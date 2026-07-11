@@ -157,18 +157,15 @@ body {
     background: white !important;
     color: black !important;
   }
-  /* Hide all dashboard layouts, sidebar, headers and panels */
-  body > *:not(.print-area),
-  div:not(.print-area),
-  aside,
-  header,
-  nav,
-  button {
+  /* Hide Next.js application root sibling wrappers under body */
+  body > *:not(.print-area) {
     display: none !important;
   }
-  .print-area,
-  .print-area * {
+  .print-area {
     display: block !important;
-    visibility: visible !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
   }
 }

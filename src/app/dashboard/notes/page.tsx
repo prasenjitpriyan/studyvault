@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { BookOpen, Folder, Search, Plus, Trash2, Edit3, Eye, FileText, Tag, Loader2, Star, Volume2, VolumeX, Printer, Sparkles, Brain, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -40,8 +41,17 @@ export default function NotesPage() {
   const [generatedCards, setGeneratedCards] = useState<{ front: string; back: string }[]>([]);
   const [isGeneratingCards, setIsGeneratingCards] = useState(false);
   const [isAiFlashcardsMode, setIsAiFlashcardsMode] = useState(false); // toggle drawer panel view
+  const [isMounted, setIsMounted] = useState(false);
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Set isMounted on client load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Update form fields when active note changes
   const selectNote = (note: Note) => {
@@ -744,13 +754,16 @@ export default function NotesPage() {
             </div>
 
             {/* Hidden Printing Canvas */}
-            <div className="hidden print:block print-area p-8 text-black bg-white">
-              <h1 className="text-3xl font-black mb-4 border-b border-zinc-200 pb-2">{title}</h1>
-              <div
-                className="prose max-w-none text-sm leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
-              />
-            </div>
+            {isMounted && createPortal(
+              <div className="hidden print:block print-area p-8 text-black bg-white">
+                <h1 className="text-3xl font-black mb-4 border-b border-zinc-200 pb-2">{title}</h1>
+                <div
+                  className="prose max-w-none text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
+                />
+              </div>,
+              document.body
+            )}
 
             {/* Editor / Preview Content Canvas */}
             <div className="flex-1 flex min-h-0 relative">

@@ -118,7 +118,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto pt-16 md:pt-0">
-        <main className="flex-1 p-6 md:p-8 relative">
+        <main className="flex-1 p-6 md:p-8 relative overflow-hidden">
           <div className="absolute top-[-10%] right-[-10%] w-[35%] h-[35%] rounded-full bg-indigo-900/5 blur-[120px] pointer-events-none" />
           <div className="absolute bottom-[-10%] left-[-10%] w-[35%] h-[35%] rounded-full bg-purple-900/5 blur-[120px] pointer-events-none" />
 

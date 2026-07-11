@@ -458,34 +458,53 @@ export default function NotesPage() {
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
-  // Custom Markdown Parser
+  // Markdown Parser — produces semantic HTML styled via .study-prose CSS class
   const parseMarkdown = (md: string) => {
-    if (!md) return '<p class="text-zinc-500 italic">No content. Start writing in Markdown...</p>';
+    if (!md) return '<p style="opacity:0.45;font-style:italic;">No content yet. Start writing in Markdown...</p>';
 
-    // Escape basic HTML to prevent XSS
+    // Escape HTML to prevent XSS
     let html = md
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
 
-    // Header conversions
-    html = html.replace(/^### (.*$)/gim, '<h3 class="text-md font-bold mt-4 mb-2 text-zinc-100">$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2 class="text-lg font-extrabold mt-5 mb-2 text-zinc-100 border-b border-zinc-800 pb-1">$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1 class="text-2xl font-black mt-6 mb-3 text-indigo-400">$1</h1>');
+    // Fenced code blocks ```lang\n...\n```
+    html = html.replace(/```[\w]*\n([\s\S]*?)```/gm,
+      '<pre style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin:1rem 0;"><code style="font-family:var(--font-geist-mono),monospace;font-size:0.82em;line-height:1.7;color:#a5b4fc;">$1</code></pre>');
 
-    // Inline formatting
-    html = html.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
-    html = html.replace(/\*(.*)\*/gim, '<em>$1</em>');
-    html = html.replace(/`(.*)`/gim, '<code class="bg-zinc-850 text-indigo-300 px-1.5 py-0.5 rounded font-mono text-xs">$1</code>');
+    // Horizontal rule
+    html = html.replace(/^---$/gim, '<hr />');
+
+    // H1 H2 H3 — mapped to .study-prose heading styles
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim,  '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim,   '<h1>$1</h1>');
+
+    // Inline: bold, italic, inline-code
+    html = html.replace(/\*\*([^*]+)\*\*/gm, '<strong>$1</strong>');
+    html = html.replace(/\*([^*]+)\*/gm,     '<em>$1</em>');
+    html = html.replace(/`([^`]+)`/gm,        '<code>$1</code>');
 
     // Blockquote
-    html = html.replace(/^\>(.*$)/gim, '<blockquote class="border-l-4 border-indigo-500 pl-4 py-1 my-3 bg-indigo-500/5 text-zinc-300 italic">$1</blockquote>');
+    html = html.replace(/^&gt; ?(.*$)/gim, '<blockquote>$1</blockquote>');
 
-    // Bullet Lists
-    html = html.replace(/^\s*-\s+(.*$)/gim, '<li class="list-disc list-inside text-zinc-300 ml-4 my-1">$1</li>');
+    // Ordered lists
+    html = html.replace(/^\d+\.\s+(.*$)/gim, '<li style="list-style-type:decimal">$1</li>');
 
-    // Paragraph breaks
-    html = html.split('\n').join('<br />');
+    // Unordered lists — dash or asterisk bullets
+    html = html.replace(/^[\-\*]\s+(.*$)/gim, '<li>$1</li>');
+
+    // Paragraph — wrap double newlines
+    html = html
+      .split('\n\n')
+      .map((block) => {
+        const trimmed = block.trim();
+        if (!trimmed) return '';
+        // Don't double-wrap block elements
+        if (/^<(h[1-6]|ul|ol|li|pre|blockquote|hr)/.test(trimmed)) return trimmed;
+        return `<p>${trimmed.replace(/\n/g, '<br />')}</p>`;
+      })
+      .join('\n');
 
     return html;
   };
@@ -784,8 +803,11 @@ export default function NotesPage() {
                 <textarea
                   value={content}
                   onChange={handleContentChange}
-                  placeholder="Write your study notes in markdown format (# headers, **bold**, *italics*, - bullet points...)"
-                  className={`flex-1 h-full p-6 bg-muted/5 text-foreground outline-none border-none resize-none font-mono text-sm leading-relaxed focus:ring-0 focus:outline-none ${editMode === 'both' ? 'hidden md:block' : ''}`}
+                  placeholder="Write your study notes in Markdown...&#10;&#10;# Heading 1&#10;## Heading 2&#10;**bold**  *italic*  `code`&#10;- bullet point&#10;&gt; blockquote"
+                  spellCheck
+                  className={`study-editor flex-1 h-full p-7 bg-(--study-bg) outline-none border-none resize-none focus:ring-0 focus:outline-none ${
+                    editMode === 'both' ? 'hidden md:block' : ''
+                  }`}
                 />
               )}
 
@@ -794,9 +816,9 @@ export default function NotesPage() {
 
               {/* LIVE PREVIEW AREA */}
               {(editMode === 'preview' || editMode === 'both') && (
-                <div className="flex-1 h-full p-6 overflow-y-auto bg-muted/5 select-text">
+                <div className="flex-1 h-full p-7 overflow-y-auto bg-(--study-bg) select-text">
                   <div
-                    className="prose dark:prose-invert max-w-none text-sm text-foreground leading-relaxed space-y-2 select-text"
+                    className="study-prose select-text"
                     dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
                   />
                 </div>

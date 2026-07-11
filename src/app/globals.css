@@ -1,56 +1,82 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────
+   DARK MODE (default) — Study-optimised contrast
+   Pure #000 background causes halo/halation eye-strain on OLED.
+   Pure #fff foreground causes photophobia on dark backgrounds.
+   Research recommendation: ~86% luminance foreground on dark bg.
+───────────────────────────────────────────────────────────── */
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #09090b;
-  --popover-foreground: #fafafa;
+  --background: #0d0d14;       /* deep ink blue-black — softer than #000 */
+  --foreground: #dde1ea;       /* warm off-white — reduces glare vs pure white */
+  --card: #14141f;             /* slightly lighter than bg */
+  --card-foreground: #dde1ea;
+  --popover: #0d0d14;
+  --popover-foreground: #dde1ea;
   --primary: #6366f1;
   --primary-foreground: #ffffff;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
+  --secondary: #1e1e2e;
+  --secondary-foreground: #c4c9d8;
+  --muted: #1a1a28;
+  --muted-foreground: #8891aa;  /* slightly blue-tinted — easier on dark screens */
   --accent: #8b5cf6;
-  --accent-foreground: #fafafa;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
-  --border: #27272a;
-  --input: #27272a;
+  --border: #22223a;
+  --input: #22223a;
   --ring: #6366f1;
   --radius: 0.75rem;
 
-  --glass-bg: rgba(15, 15, 23, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  /* Study content area tokens */
+  --study-bg: #0f0f1a;         /* note editor/preview bg — slightly set back */
+  --study-text: #d8dce8;       /* body text: warm grey-blue, comfortable for long reads */
+  --study-heading: #e8eaf0;    /* headings slightly brighter */
+  --study-muted: #7a849e;      /* secondary annotations */
+  --study-line-height: 1.85;   /* research: 1.7–1.9 optimal for body text */
+  --study-font-size: 0.9375rem;/* 15px — sweet spot: readable without being large */
+  --study-max-width: 68ch;     /* optimal: 60–75 chars per line for comprehension */
+
+  --glass-bg: rgba(13, 13, 20, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.07);
   --gradient-from: #a5b4fc;
   --gradient-to: #c084fc;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   LIGHT MODE — Warm parchment-ish white, not harsh pure white
+───────────────────────────────────────────────────────────── */
 .light {
-  --background: #fcfcfd;
-  --foreground: #09090b;
+  --background: #f7f7fb;        /* barely-there lavender tint — not stark white */
+  --foreground: #1c1c2e;        /* deep blue-grey — easier than #000 */
   --card: #ffffff;
-  --card-foreground: #09090b;
+  --card-foreground: #1c1c2e;
   --popover: #ffffff;
-  --popover-foreground: #09090b;
+  --popover-foreground: #1c1c2e;
   --primary: #4f46e5;
   --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #09090b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
+  --secondary: #f0f0f8;
+  --secondary-foreground: #1c1c2e;
+  --muted: #ebebf5;
+  --muted-foreground: #64637a;
   --accent: #7c3aed;
   --accent-foreground: #ffffff;
-  --destructive: #ef4444;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
+  --border: #e0e0f0;
+  --input: #e0e0f0;
   --ring: #4f46e5;
 
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(0, 0, 0, 0.08);
+  --study-bg: #fdfcff;
+  --study-text: #252437;        /* near-dark blue for light mode reading */
+  --study-heading: #14142a;
+  --study-muted: #6c6b88;
+  --study-line-height: 1.85;
+  --study-font-size: 0.9375rem;
+  --study-max-width: 68ch;
+
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(0, 0, 0, 0.07);
   --gradient-from: #4f46e5;
   --gradient-to: #9333ea;
 }
@@ -80,33 +106,47 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   BASE TYPOGRAPHY — Study-optimised global defaults
+───────────────────────────────────────────────────────────── */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 0.9375rem;           /* 15px — comfortable base for app chrome */
+  line-height: 1.65;              /* app chrome: slightly tighter than study areas */
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
 }
 
 /* xs breakpoint helper — used by LandingClient CTA row */
 @custom-media --xs (min-width: 480px);
 
-/* Custom Scrollbar */
+/* ─────────────────────────────────────────────────────────────
+   CUSTOM SCROLLBAR — Thin, unobtrusive
+───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
 }
-
-/* Smooth active components transitions */
 
 /* Hide scrollbar, keep scroll functionality */
 .scrollbar-none {
@@ -116,32 +156,188 @@ body {
   display: none;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   GLASS MORPHISM
+───────────────────────────────────────────────────────────── */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
 }
 
 .glass-card-hover:hover {
   border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.12);
   transform: translateY(-2px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   TEXT GRADIENTS
+───────────────────────────────────────────────────────────── */
 .text-gradient {
   background: linear-gradient(135deg, var(--gradient-from) 0%, var(--gradient-to) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .text-gradient-emerald {
   background: linear-gradient(135deg, #34d399 0%, #059669 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Card 3D Flip */
+/* ─────────────────────────────────────────────────────────────
+   STUDY PROSE — Markdown preview reading area
+   Follows WCAG AA contrast + Baymard Institute reading research:
+   • line-height 1.7–1.9 for body text
+   • max-width ~65–72ch for comfortable eye tracking
+   • generous paragraph margin (1em) to separate ideas visually
+   • headings slightly larger with clear spacing above/below
+───────────────────────────────────────────────────────────── */
+.study-prose {
+  font-size: var(--study-font-size);
+  line-height: var(--study-line-height);
+  color: var(--study-text);
+  max-width: var(--study-max-width);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.study-prose p {
+  margin-bottom: 1em;
+}
+
+.study-prose h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+  color: var(--study-heading);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.study-prose h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--study-heading);
+}
+
+.study-prose h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-top: 1.4rem;
+  margin-bottom: 0.4rem;
+  color: var(--study-heading);
+}
+
+.study-prose strong {
+  font-weight: 700;
+  color: var(--study-heading);
+}
+
+.study-prose em {
+  font-style: italic;
+  color: var(--study-text);
+  opacity: 0.9;
+}
+
+.study-prose code {
+  font-family: var(--font-geist-mono), 'JetBrains Mono', monospace;
+  font-size: 0.83em;
+  background: rgba(99, 102, 241, 0.1);
+  color: #a5b4fc;
+  padding: 0.15em 0.45em;
+  border-radius: 4px;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.light .study-prose code {
+  background: rgba(79, 70, 229, 0.07);
+  color: #4338ca;
+  border-color: rgba(79, 70, 229, 0.15);
+}
+
+.study-prose blockquote {
+  border-left: 3px solid var(--primary);
+  padding: 0.5rem 1rem;
+  margin: 1.25rem 0;
+  background: rgba(99, 102, 241, 0.04);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  color: var(--study-muted);
+}
+
+.study-prose ul,
+.study-prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1em;
+}
+
+.study-prose li {
+  margin-bottom: 0.35em;
+  line-height: var(--study-line-height);
+}
+
+.study-prose ul li {
+  list-style-type: disc;
+}
+
+.study-prose ol li {
+  list-style-type: decimal;
+}
+
+.study-prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   STUDY EDITOR (textarea write area)
+───────────────────────────────────────────────────────────── */
+.study-editor {
+  font-family: var(--font-geist-mono), 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;          /* 14px — monospace is slightly wider, so smaller */
+  line-height: 1.9;             /* generous for code-style editing */
+  color: var(--study-text);
+  caret-color: #818cf8;         /* indigo cursor — easy to spot */
+  tab-size: 2;
+  letter-spacing: 0.01em;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FLASHCARD STUDY TYPOGRAPHY — Clear question/answer hierarchy
+───────────────────────────────────────────────────────────── */
+.flashcard-text {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  letter-spacing: 0.005em;
+  color: var(--foreground);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FOCUS TIMER — Mono digit display
+───────────────────────────────────────────────────────────── */
+.timer-display {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CARD 3D FLIP
+───────────────────────────────────────────────────────────── */
 .perspective-1000 {
   perspective: 1000px;
 }
@@ -163,13 +359,16 @@ body {
   transform: rotateY(180deg);
 }
 
-/* PDF Printing formatting */
+/* ─────────────────────────────────────────────────────────────
+   PDF PRINT FORMATTING
+───────────────────────────────────────────────────────────── */
 @media print {
   body {
     background: white !important;
-    color: black !important;
+    color: #1a1a2e !important;
+    font-size: 11pt !important;
+    line-height: 1.7 !important;
   }
-  /* Hide Next.js application root sibling wrappers under body */
   body > *:not(.print-area) {
     display: none !important;
   }
@@ -179,5 +378,10 @@ body {
     left: 0;
     top: 0;
     width: 100%;
+    padding: 2cm;
   }
+  .print-area h1 { font-size: 20pt; margin-bottom: 12pt; }
+  .print-area h2 { font-size: 15pt; margin-top: 18pt; }
+  .print-area h3 { font-size: 12pt; margin-top: 14pt; }
+  .print-area p  { margin-bottom: 8pt; }
 }

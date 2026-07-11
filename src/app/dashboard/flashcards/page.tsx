@@ -369,7 +369,7 @@ export default function FlashcardsPage() {
                   {/* Front Side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden glass-panel bg-card/40 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
                     <div className="flex-1 flex items-center justify-center">
-                      <p className="text-foreground text-lg font-bold max-w-md wrap-break-word">{practiceCards[currentCardIndex]?.front}</p>
+                      <p className="flashcard-text text-foreground font-semibold max-w-md wrap-break-word text-center">{practiceCards[currentCardIndex]?.front}</p>
                     </div>
                     <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold bg-card/80 px-3 py-1 rounded-full border border-border">
                       Click to flip & view answer
@@ -379,7 +379,7 @@ export default function FlashcardsPage() {
                   {/* Back Side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 glass-panel border-indigo-500/20 bg-card/40 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
                     <div className="flex-1 flex items-center justify-center">
-                      <p className="text-foreground text-lg font-bold max-w-md wrap-break-word">{practiceCards[currentCardIndex]?.back}</p>
+                      <p className="flashcard-text text-foreground font-semibold max-w-md wrap-break-word text-center">{practiceCards[currentCardIndex]?.back}</p>
                     </div>
                     <span className="text-[10px] text-indigo-400/80 uppercase tracking-widest font-bold bg-indigo-500/5 px-3 py-1 rounded-full border border-indigo-500/10">
                       Answer Revealed

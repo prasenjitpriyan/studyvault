@@ -321,7 +321,7 @@ export default function DashboardPage() {
 
           <div className="flex-1 flex flex-col items-center justify-center py-6">
             {/* Digital Clock display */}
-            <div className="text-7xl md:text-8xl font-black font-mono tracking-tight mb-2 text-gradient">
+            <div className="timer-display text-7xl md:text-8xl font-black font-mono tracking-tight mb-2 text-gradient">
               {String(timerMinutes).padStart(2, '0')}:{String(timerSeconds).padStart(2, '0')}
             </div>
             <p className="text-xs text-muted-foreground mb-8 uppercase tracking-widest font-semibold">

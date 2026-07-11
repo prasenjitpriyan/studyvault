@@ -16,7 +16,7 @@ export default function LandingClient() {
     const ctx = gsap.context(() => {
       // 1. Staggered landing elements loading transitions
       const tl = gsap.timeline();
-      
+
       tl.fromTo('.gsap-logo',
         { opacity: 0, x: -20 },
         { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
@@ -164,7 +164,7 @@ export default function LandingClient() {
 
   return (
     <div ref={containerRef} className="relative min-h-screen bg-background text-foreground flex flex-col justify-between overflow-hidden">
-      
+
       {/* Decorative Background Blur Nodes */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px] pointer-events-none" />
@@ -193,10 +193,10 @@ export default function LandingClient() {
 
       {/* Hero Section Split Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center z-10">
-        
+
         {/* Left Side: Copy Elements */}
-        <div className="lg:col-span-7 text-left space-y-6 flex flex-col justify-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold tracking-wide self-start gsap-pill shadow-xs">
+        <div className="lg:col-span-7 text-center lg:text-left space-y-6 flex flex-col justify-center items-center lg:items-start">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold tracking-wide self-center lg:self-start gsap-pill shadow-xs">
             <Sparkles className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" /> Supercharge Your Study Flow
           </div>
 
@@ -209,7 +209,7 @@ export default function LandingClient() {
             Organise notes, master materials using spaced-repetition flashcards, and run your academic schedule with a sleek, minimalist planner.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-2 gsap-ctas">
+          <div className="flex flex-col sm:flex-row gap-4 pt-2 gsap-ctas w-full sm:w-auto justify-center lg:justify-start">
             <Link
               href="/signup"
               className="flex items-center justify-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-xl shadow-xl shadow-indigo-500/25 transition-all"
@@ -227,7 +227,7 @@ export default function LandingClient() {
 
         {/* Right Side: Animated SVG vault vector */}
         <div className="lg:col-span-5 flex justify-center items-center relative select-none gsap-vault-area">
-          <svg width="450" height="450" viewBox="0 0 450 450" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full max-w-[380px] md:max-w-[440px] drop-shadow-3xl">
+          <svg width="450" height="450" viewBox="0 0 450 450" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full max-w-70 sm:max-w-90 lg:max-w-110 drop-shadow-3xl">
             {/* Center glow radial canvas */}
             <circle cx="225" cy="225" r="125" fill="url(#vault-glow)" opacity="0.35" />
 
@@ -299,7 +299,7 @@ export default function LandingClient() {
       {/* Feature Highlights Grid */}
       <section className="w-full max-w-7xl mx-auto px-6 pb-20 z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
+
           {/* Notes Card */}
           <div
             onMouseEnter={handleCardMouseEnter}

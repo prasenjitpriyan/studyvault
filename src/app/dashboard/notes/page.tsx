@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { BookOpen, Folder, Search, Plus, Trash2, Edit3, Eye, FileText, Tag, Loader2, Star, Volume2, VolumeX, Printer, Sparkles, Brain, Check } from 'lucide-react';
+import { BookOpen, Folder, Search, Plus, Trash2, Edit3, Eye, FileText, Tag, Loader2, Star, Volume2, VolumeX, Printer, Sparkles, Brain, Check, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Note {
@@ -42,6 +42,7 @@ export default function NotesPage() {
   const [isGeneratingCards, setIsGeneratingCards] = useState(false);
   const [isAiFlashcardsMode, setIsAiFlashcardsMode] = useState(false); // toggle drawer panel view
   const [isMounted, setIsMounted] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(true);
 
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -61,6 +62,7 @@ export default function NotesPage() {
     setFolderField(note.folder);
     setTags(note.tags || []);
     setTagInput('');
+    setShowMobileSidebar(false);
   };
 
   useEffect(() => {
@@ -489,10 +491,10 @@ export default function NotesPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex gap-6">
+    <div className="h-[calc(100vh-8rem)] flex flex-col md:flex-row gap-6 relative">
 
       {/* LEFT SIDEBAR: Notes Directory */}
-      <div className="w-80 flex flex-col glass-panel rounded-2xl overflow-hidden h-full">
+      <div className={`w-full md:w-80 flex flex-col glass-panel rounded-2xl overflow-hidden h-full ${showMobileSidebar ? 'flex' : 'hidden md:flex'}`}>
 
         {/* Directory Header */}
         <div className="p-4 border-b border-zinc-800/80 space-y-3">
@@ -595,12 +597,19 @@ export default function NotesPage() {
       </div>
 
       {/* RIGHT WORKSPACE: Note Editor */}
-      <div className="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden h-full">
+      <div className={`flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden h-full ${!showMobileSidebar ? 'flex' : 'hidden md:flex'}`}>
         {activeNote ? (
           <>
             {/* Editor Actions Header */}
             <div className="p-4 border-b border-border/80 flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                {/* Mobile Back Button */}
+                <button
+                  onClick={() => setShowMobileSidebar(true)}
+                  className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted hover:bg-muted/80 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all cursor-pointer mr-1"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </button>
                 <input
                   type="text"
                   value={title}
@@ -634,9 +643,11 @@ export default function NotesPage() {
                       <button
                         key={btn.mode}
                         onClick={() => setEditMode(btn.mode as 'write' | 'preview' | 'both')}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all ${
+                        className={`items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all ${
+                          btn.mode === 'both' ? 'hidden md:flex' : 'flex'
+                        } ${
                           editMode === btn.mode
-                            ? 'bg-card text-foreground shadow-md'
+                            ? 'bg-card text-foreground shadow-sm'
                             : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
@@ -766,7 +777,7 @@ export default function NotesPage() {
             )}
 
             {/* Editor / Preview Content Canvas */}
-            <div className="flex-1 flex min-h-0 relative">
+            <div className="flex-1 flex flex-col md:flex-row min-h-0 relative">
 
               {/* EDITOR AREA */}
               {(editMode === 'write' || editMode === 'both') && (
@@ -774,12 +785,12 @@ export default function NotesPage() {
                   value={content}
                   onChange={handleContentChange}
                   placeholder="Write your study notes in markdown format (# headers, **bold**, *italics*, - bullet points...)"
-                  className="flex-1 h-full p-6 bg-muted/5 text-foreground outline-none border-none resize-none font-mono text-sm leading-relaxed focus:ring-0 focus:outline-none"
+                  className={`flex-1 h-full p-6 bg-muted/5 text-foreground outline-none border-none resize-none font-mono text-sm leading-relaxed focus:ring-0 focus:outline-none ${editMode === 'both' ? 'hidden md:block' : ''}`}
                 />
               )}
 
               {/* SPLIT SPLITTER BAR */}
-              {editMode === 'both' && <div className="w-px bg-border" />}
+              {editMode === 'both' && <div className="hidden md:block w-px bg-border" />}
 
               {/* LIVE PREVIEW AREA */}
               {(editMode === 'preview' || editMode === 'both') && (

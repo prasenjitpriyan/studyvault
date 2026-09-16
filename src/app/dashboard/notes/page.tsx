@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { BookOpen, Folder, Search, Plus, Trash2, Edit3, Eye, FileText, Tag, Loader2, Star, Volume2, VolumeX, Printer, Sparkles, Brain, Check, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
 interface Note {
@@ -576,12 +577,19 @@ export default function NotesPage() {
                 <div
                   key={note._id}
                   onClick={() => selectNote(note)}
-                  className={`p-3.5 rounded-xl transition-all cursor-pointer border relative group/item ${
+                  className={`p-3.5 rounded-xl transition-all cursor-pointer border relative group/item overflow-hidden ${
                     isActive
-                      ? 'bg-linear-to-r from-indigo-500/10 to-purple-500/5 border-indigo-500/20'
+                      ? 'border-indigo-500/30 shadow-xs'
                       : 'bg-muted/10 hover:bg-muted/30 border-transparent'
                   }`}
                 >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNoteHighlight"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      className="absolute inset-0 bg-linear-to-r from-indigo-500/15 to-purple-500/10 pointer-events-none -z-10"
+                    />
+                  )}
                   <div className="flex items-start justify-between gap-2">
                     <h4 className={`text-xs font-semibold truncate ${isActive ? 'text-indigo-400 dark:text-indigo-300 font-bold' : 'text-foreground'} flex-1`}>
                       {note.title || 'Untitled Note'}
@@ -651,27 +659,35 @@ export default function NotesPage() {
 
               {/* View options */}
               <div className="flex items-center gap-3">
-                <div className="flex rounded-lg bg-muted border border-border p-0.5">
+                <div className="flex rounded-lg bg-muted border border-border p-0.5 relative">
                   {[
                     { mode: 'write', label: 'Edit', icon: Edit3 },
                     { mode: 'preview', label: 'Preview', icon: Eye },
                     { mode: 'both', label: 'Split', icon: FileText },
                   ].map((btn) => {
                     const Icon = btn.icon;
+                    const isTabActive = editMode === btn.mode;
                     return (
                       <button
                         key={btn.mode}
                         onClick={() => setEditMode(btn.mode as 'write' | 'preview' | 'both')}
-                        className={`items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all ${
+                        className={`relative items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold transition-colors cursor-pointer ${
                           btn.mode === 'both' ? 'hidden md:flex' : 'flex'
                         } ${
-                          editMode === btn.mode
-                            ? 'bg-card text-foreground shadow-sm'
+                          isTabActive
+                            ? 'text-foreground'
                             : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
-                        <Icon className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{btn.label}</span>
+                        {isTabActive && (
+                          <motion.div
+                            layoutId="notesTabPill"
+                            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                            className="absolute inset-0 bg-card rounded-md shadow-xs -z-10 border border-border/50"
+                          />
+                        )}
+                        <Icon className="h-3 w-3" />
+                        {btn.label}
                       </button>
                     );
                   })}
@@ -825,110 +841,116 @@ export default function NotesPage() {
               )}
 
               {/* AI Study Assistant Drawer Overlay */}
-              {aiDrawerOpen && (
-                <div className="w-80 border-l border-border bg-card/95 backdrop-blur-md flex flex-col h-full z-20 absolute right-0 top-0 transition-all animate-in slide-in-from-right duration-300">
-                  <div className="p-4 border-b border-border/80 flex items-center justify-between">
-                    <h3 className="font-bold text-sm flex items-center gap-1.5 text-indigo-400 dark:text-indigo-300">
-                      <Brain className="h-4 w-4 text-purple-400" /> AI Study Assistant
-                    </h3>
-                    <button
-                      onClick={() => setAiDrawerOpen(false)}
-                      className="text-muted-foreground hover:text-foreground text-xs font-bold px-2 py-1 rounded bg-muted hover:bg-muted/80 cursor-pointer"
-                    >
-                      Close
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-none">
-                    {/* Action Hub */}
-                    <div className="flex gap-2">
+              <AnimatePresence>
+                {aiDrawerOpen && (
+                  <motion.div
+                    initial={{ x: '100%', opacity: 0.8 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: '100%', opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    className="w-80 border-l border-border bg-card/95 backdrop-blur-md flex flex-col h-full z-20 absolute right-0 top-0 shadow-2xl"
+                  >
+                    <div className="p-4 border-b border-border/80 flex items-center justify-between">
+                      <h3 className="font-bold text-sm flex items-center gap-1.5 text-indigo-400 dark:text-indigo-300">
+                        <Brain className="h-4 w-4 text-purple-400" /> AI Study Assistant
+                      </h3>
                       <button
-                        onClick={handleAISummarize}
-                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                          !isAiFlashcardsMode
-                            ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 dark:text-indigo-300'
-                            : 'bg-muted border-border text-muted-foreground hover:text-foreground'
-                        }`}
+                        onClick={() => setAiDrawerOpen(false)}
+                        className="text-muted-foreground hover:text-foreground text-xs font-bold px-2 py-1 rounded bg-muted hover:bg-muted/80 cursor-pointer"
                       >
-                        Summarize
-                      </button>
-                      <button
-                        onClick={handleAIGenerateCards}
-                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                          isAiFlashcardsMode
-                            ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 dark:text-purple-300'
-                            : 'bg-muted border-border text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        Generate Cards
+                        Close
                       </button>
                     </div>
 
-                    {/* AI Loading State */}
-                    {isAiLoading && (
-                      <div className="py-8 text-center flex flex-col items-center gap-2 text-xs text-muted-foreground">
-                        <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
-                        <span>AI model analyzing notes...</span>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-none">
+                      {/* Action Hub */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleAISummarize}
+                          className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                            !isAiFlashcardsMode
+                              ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 dark:text-indigo-300'
+                              : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          Summarize
+                        </button>
+                        <button
+                          onClick={handleAIGenerateCards}
+                          className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                            isAiFlashcardsMode
+                              ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 dark:text-purple-300'
+                              : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          Flashcards
+                        </button>
                       </div>
-                    )}
 
-                    {/* Summary Results View */}
-                    {!isAiLoading && !isAiFlashcardsMode && (
-                      <div className="space-y-3">
-                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Notes Summary</span>
-                        {aiSummary ? (
-                          <div className="p-3.5 bg-muted/40 border border-border/80 rounded-xl text-xs text-foreground leading-relaxed whitespace-pre-line">
-                            {aiSummary}
-                          </div>
-                        ) : (
-                          <div className="text-center py-6 border border-dashed border-border rounded-xl text-xs text-muted-foreground">
-                            Click &quot;Summarize&quot; above to generate a brief summary.
-                          </div>
-                        )}
-                      </div>
-                    )}
+                      {/* Content Panel */}
+                      {!isAiFlashcardsMode ? (
+                        /* Summary View */
+                        <div className="space-y-3">
+                          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                            Executive Summary
+                          </h4>
+                          {isAiLoading ? (
+                            <div className="p-6 text-center text-xs text-muted-foreground flex flex-col items-center gap-2">
+                              <Loader2 className="h-5 w-5 animate-spin text-indigo-400" />
+                              Distilling conceptual essence...
+                            </div>
+                          ) : aiSummary ? (
+                            <div className="p-3.5 rounded-xl bg-muted/40 border border-border text-xs leading-relaxed text-foreground whitespace-pre-wrap select-text">
+                              {aiSummary}
+                            </div>
+                          ) : (
+                            <div className="text-center py-6 border border-dashed border-border rounded-xl text-xs text-muted-foreground">
+                              Click &quot;Summarize&quot; to distill your note into key concepts.
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        /* Generated Flashcards View */
+                        <div className="space-y-3">
+                          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                            Generated Flashcards
+                          </h4>
 
-                    {/* Flashcard Generation View */}
-                    {!isAiLoading && isAiFlashcardsMode && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Target Study Deck</label>
-                          {aiDecks.length > 0 ? (
+                          {/* Deck Selector */}
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-semibold text-muted-foreground">Target Deck</label>
                             <select
                               value={selectedAiDeck}
                               onChange={(e) => setSelectedAiDeck(e.target.value)}
-                              className="w-full p-2 bg-muted border border-border rounded-xl text-xs outline-none text-foreground cursor-pointer"
+                              className="w-full text-xs p-2 rounded-lg bg-muted border border-border text-foreground"
                             >
+                              <option value="">Select a deck to save cards into</option>
                               {aiDecks.map((d) => (
                                 <option key={d._id} value={d._id}>
                                   {d.name}
                                 </option>
                               ))}
                             </select>
-                          ) : (
-                            <div className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
-                              No flashcard decks found. Please go to Flashcards tab to create a deck first!
-                            </div>
-                          )}
-                        </div>
+                          </div>
 
-                        <div className="space-y-3">
-                          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Generated Cards ({generatedCards.length})</span>
-                          {generatedCards.length > 0 ? (
-                            <div className="space-y-3">
-                              <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                                {generatedCards.map((card, idx) => (
-                                  <div key={idx} className="p-3 bg-muted/30 border border-border rounded-xl text-[11px] space-y-1">
-                                    <div className="font-semibold text-indigo-400">Front: <span className="text-foreground font-normal">{card.front}</span></div>
-                                    <div className="font-semibold text-purple-400">Back: <span className="text-foreground font-normal">{card.back}</span></div>
-                                  </div>
-                                ))}
-                              </div>
+                          {isAiLoading ? (
+                            <div className="p-6 text-center text-xs text-muted-foreground flex flex-col items-center gap-2">
+                              <Loader2 className="h-5 w-5 animate-spin text-purple-400" />
+                              Synthesizing flashcards...
+                            </div>
+                          ) : generatedCards.length > 0 ? (
+                            <div className="space-y-2.5">
+                              {generatedCards.map((card, idx) => (
+                                <div key={idx} className="p-2.5 rounded-xl bg-muted/40 border border-border space-y-1 text-xs">
+                                  <div className="font-semibold text-foreground">Q: {card.front}</div>
+                                  <div className="text-muted-foreground">A: {card.back}</div>
+                                </div>
+                              ))}
 
                               <button
                                 onClick={handleSaveGeneratedCards}
                                 disabled={isGeneratingCards || !selectedAiDeck}
-                                className="w-full py-2.5 px-4 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                                className="w-full py-2 px-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all"
                               >
                                 {isGeneratingCards ? (
                                   <>
@@ -947,11 +969,11 @@ export default function NotesPage() {
                             </div>
                           )}
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
             </div>
           </>

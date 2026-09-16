@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Calendar, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
+import Modal from '@/components/ui/Modal';
 
 interface Task {
   _id: string;
@@ -155,19 +157,29 @@ export default function TasksPage() {
             </div>
 
             <div className="space-y-3 flex-1 min-h-60 bg-muted/10 p-2.5 rounded-2xl border border-border border-dashed">
-              {todoTasks.length === 0 ? (
-                <div className="text-center py-8 text-xs text-muted-foreground">No tasks in queue.</div>
-              ) : (
-                todoTasks.map((task) => (
-                  <TaskCard
-                    key={task._id}
-                    task={task}
-                    isOverdue={isOverdue(task.dueDate)}
-                    onMoveRight={() => handleUpdateStatus(task._id, 'in_progress')}
-                    onDelete={() => handleDeleteTask(task._id)}
-                  />
-                ))
-              )}
+              <AnimatePresence mode="popLayout" initial={false}>
+                {todoTasks.length === 0 ? (
+                  <motion.div
+                    key="empty-todo"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-center py-8 text-xs text-muted-foreground"
+                  >
+                    No tasks in queue.
+                  </motion.div>
+                ) : (
+                  todoTasks.map((task) => (
+                    <TaskCard
+                      key={task._id}
+                      task={task}
+                      isOverdue={isOverdue(task.dueDate)}
+                      onMoveRight={() => handleUpdateStatus(task._id, 'in_progress')}
+                      onDelete={() => handleDeleteTask(task._id)}
+                    />
+                  ))
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -181,20 +193,30 @@ export default function TasksPage() {
             </div>
 
             <div className="space-y-3 flex-1 min-h-60 bg-muted/10 p-2.5 rounded-2xl border border-border border-dashed">
-              {inProgressTasks.length === 0 ? (
-                <div className="text-center py-8 text-xs text-muted-foreground">No tasks active.</div>
-              ) : (
-                inProgressTasks.map((task) => (
-                  <TaskCard
-                    key={task._id}
-                    task={task}
-                    isOverdue={isOverdue(task.dueDate)}
-                    onMoveLeft={() => handleUpdateStatus(task._id, 'todo')}
-                    onMoveRight={() => handleUpdateStatus(task._id, 'done')}
-                    onDelete={() => handleDeleteTask(task._id)}
-                  />
-                ))
-              )}
+              <AnimatePresence mode="popLayout" initial={false}>
+                {inProgressTasks.length === 0 ? (
+                  <motion.div
+                    key="empty-progress"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-center py-8 text-xs text-muted-foreground"
+                  >
+                    No tasks active.
+                  </motion.div>
+                ) : (
+                  inProgressTasks.map((task) => (
+                    <TaskCard
+                      key={task._id}
+                      task={task}
+                      isOverdue={isOverdue(task.dueDate)}
+                      onMoveLeft={() => handleUpdateStatus(task._id, 'todo')}
+                      onMoveRight={() => handleUpdateStatus(task._id, 'done')}
+                      onDelete={() => handleDeleteTask(task._id)}
+                    />
+                  ))
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -208,19 +230,29 @@ export default function TasksPage() {
             </div>
 
             <div className="space-y-3 flex-1 min-h-60 bg-muted/10 p-2.5 rounded-2xl border border-border border-dashed">
-              {doneTasks.length === 0 ? (
-                <div className="text-center py-8 text-xs text-muted-foreground">No completed tasks yet.</div>
-              ) : (
-                doneTasks.map((task) => (
-                  <TaskCard
-                    key={task._id}
-                    task={task}
-                    isOverdue={false}
-                    onMoveLeft={() => handleUpdateStatus(task._id, 'in_progress')}
-                    onDelete={() => handleDeleteTask(task._id)}
-                  />
-                ))
-              )}
+              <AnimatePresence mode="popLayout" initial={false}>
+                {doneTasks.length === 0 ? (
+                  <motion.div
+                    key="empty-done"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-center py-8 text-xs text-muted-foreground"
+                  >
+                    No completed tasks yet.
+                  </motion.div>
+                ) : (
+                  doneTasks.map((task) => (
+                    <TaskCard
+                      key={task._id}
+                      task={task}
+                      isOverdue={false}
+                      onMoveLeft={() => handleUpdateStatus(task._id, 'in_progress')}
+                      onDelete={() => handleDeleteTask(task._id)}
+                    />
+                  ))
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -228,68 +260,68 @@ export default function TasksPage() {
       )}
 
       {/* --- MODAL: CREATE TASK --- */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl relative">
-            <h3 className="text-md font-bold mb-4">Create New Task</h3>
-            <form onSubmit={handleCreateTask} className="space-y-4">
-              <div>
-                <label htmlFor="task-title" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Task Title</label>
-                <input
-                  id="task-title"
-                  type="text"
-                  placeholder="e.g. Read Physics Chapter 3, Draft essay outline"
-                  value={taskTitle}
-                  onChange={(e) => setTaskTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="task-priority" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Priority</label>
-                <select
-                  id="task-priority"
-                  value={taskPriority}
-                  onChange={(e) => setTaskPriority(e.target.value as 'low' | 'medium' | 'high')}
-                  className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
-                >
-                  <option value="low">Low Priority</option>
-                  <option value="medium">Medium Priority</option>
-                  <option value="high">High Priority</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="task-due-date" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Due Date (Optional)</label>
-                <input
-                  id="task-due-date"
-                  type="date"
-                  value={taskDueDate}
-                  onChange={(e) => setTaskDueDate(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg"
-                >
-                  Create Task
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Create New Task"
+        description="Organize your upcoming study goals and revision milestones."
+      >
+        <form onSubmit={handleCreateTask} className="space-y-4">
+          <div>
+            <label htmlFor="task-title" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Task Title</label>
+            <input
+              id="task-title"
+              type="text"
+              placeholder="e.g. Read Physics Chapter 3, Draft essay outline"
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
+              className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div>
+            <label htmlFor="task-priority" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Priority</label>
+            <select
+              id="task-priority"
+              value={taskPriority}
+              onChange={(e) => setTaskPriority(e.target.value as 'low' | 'medium' | 'high')}
+              className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
+            >
+              <option value="low">Low Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="high">High Priority</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="task-due-date" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Due Date (Optional)</label>
+            <input
+              id="task-due-date"
+              type="date"
+              value={taskDueDate}
+              onChange={(e) => setTaskDueDate(e.target.value)}
+              className="w-full px-4 py-2.5 bg-muted border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg cursor-pointer"
+            >
+              Create Task
+            </button>
+          </div>
+        </form>
+      </Modal>
 
     </div>
   );
@@ -305,8 +337,24 @@ interface TaskCardProps {
 }
 
 function TaskCard({ task, isOverdue, onMoveLeft, onMoveRight, onDelete }: TaskCardProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <div className="glass-panel p-4 rounded-xl flex flex-col justify-between space-y-4 hover:border-border transition-all">
+    <motion.div
+      layout={!shouldReduceMotion}
+      layoutId={`task-${task._id}`}
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 8 }}
+      animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, transition: { duration: 0.14 } }}
+      transition={{
+        type: 'spring',
+        stiffness: 380,
+        damping: 30,
+        mass: 0.9,
+      }}
+      whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+      className="glass-panel p-4 rounded-xl flex flex-col justify-between space-y-4 hover:border-border/80 transition-colors select-none shadow-sm"
+    >
       <div>
         <div className="flex justify-between items-start gap-2">
           <h4 className={`text-xs font-semibold text-foreground wrap-break-word leading-relaxed ${task.status === 'done' ? 'line-through text-muted-foreground' : ''}`}>
@@ -369,6 +417,6 @@ function TaskCard({ task, isOverdue, onMoveLeft, onMoveRight, onDelete }: TaskCa
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

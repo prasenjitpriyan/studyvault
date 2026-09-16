@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Sparkles, BookOpen, Layers, CheckSquare, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
+import { Sparkles, BookOpen, Layers, CheckSquare, LogOut, LayoutDashboard, Menu, X, Network } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { toast, Toaster } from 'sonner';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -11,6 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
 
   const handleLogout = async () => {
@@ -39,6 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Notes Vault', href: '/dashboard/notes', icon: BookOpen },
     { name: 'Flashcards', href: '/dashboard/flashcards', icon: Layers },
     { name: 'Task Board', href: '/dashboard/tasks', icon: CheckSquare },
+    { name: 'Knowledge Graph', href: '/dashboard/graph', icon: Network },
   ];
 
   return (
@@ -62,12 +65,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Mobile Backdrop Overlay */}
-      {sidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-10 bg-black/50 backdrop-blur-sm"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="md:hidden fixed inset-0 z-10 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar - Desktop & Mobile */}
       <aside
@@ -93,12 +102,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={item.name}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                className={`relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-linear-to-r from-indigo-500/15 to-purple-500/5 border border-indigo-500/20 text-indigo-400 dark:text-indigo-300'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent'
+                    ? 'text-indigo-400 dark:text-indigo-300 font-semibold'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
                 }`}
               >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNavHighlight"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    className="absolute inset-0 bg-linear-to-r from-indigo-500/15 to-purple-500/10 border border-indigo-500/25 rounded-xl -z-10 shadow-xs"
+                  />
+                )}
                 <Icon className={`h-5 w-5 ${isActive ? 'text-indigo-500 dark:text-indigo-400' : 'text-muted-foreground'}`} />
                 {item.name}
               </Link>
@@ -125,14 +141,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Workspace Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto pt-16 md:pt-0">
-        <main className="flex-1 p-6 md:p-8 relative overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto overflow-x-hidden pt-16 md:pt-0">
+        <main className="flex-1 p-6 md:p-8 relative">
           <div className="absolute top-[-10%] right-[-10%] w-[35%] h-[35%] rounded-full bg-indigo-900/5 blur-[120px] pointer-events-none" />
           <div className="absolute bottom-[-10%] left-[-10%] w-[35%] h-[35%] rounded-full bg-purple-900/5 blur-[120px] pointer-events-none" />
 
-          <div className="max-w-7xl mx-auto z-10 relative">
+          <motion.div
+            key={pathname}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.16, ease: 'easeOut' }}
+            className="max-w-7xl mx-auto z-10 relative"
+          >
             {children}
-          </div>
+          </motion.div>
         </main>
       </div>
     </div>

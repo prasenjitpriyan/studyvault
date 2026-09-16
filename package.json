@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/three": "^0.186.0",
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
@@ -16,11 +17,13 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.24.0",
     "mongoose": "^9.7.4",
+    "motion": "^13.3.0",
     "next": "^16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
+    "three": "^0.186.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

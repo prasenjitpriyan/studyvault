@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, Layers, CheckSquare, Sparkles, ArrowRight, Menu, X } from 'lucide-react';
+import { BookOpen, Layers, CheckSquare, Sparkles, ArrowRight, Menu, X, Network, Brain } from 'lucide-react';
 import gsap from 'gsap';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -14,72 +14,115 @@ export default function LandingClient() {
     if (typeof window === 'undefined') return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
+      const mm = gsap.matchMedia();
 
-      tl.fromTo('.gsap-logo',
-        { opacity: 0, x: -20 },
-        { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
-      )
-      .fromTo('.gsap-header-actions',
-        { opacity: 0, x: 20 },
-        { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' },
-        '-=0.6'
-      )
-      .fromTo('.gsap-pill',
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 0.7, ease: 'back.out(1.5)' },
-        '-=0.2'
-      )
-      .fromTo('.gsap-title',
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-        '-=0.4'
-      )
-      .fromTo('.gsap-text',
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-        '-=0.5'
-      )
-      .fromTo('.gsap-ctas',
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
-        '-=0.5'
-      )
-      .fromTo('.gsap-vault-area',
-        { opacity: 0, scale: 0.85, rotate: -5 },
-        { opacity: 1, scale: 1, rotate: 0, duration: 1.2, ease: 'elastic.out(1, 0.75)' },
-        '-=0.8'
-      )
-      .fromTo('.gsap-card-item',
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.15 },
-        '-=0.7'
-      );
+      // Respect prefers-reduced-motion
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Continuous SVG Loop Animations
-      gsap.to('.vault-body', {
-        y: -15, duration: 3.5, repeat: -1, yoyo: true, ease: 'power1.inOut'
+        tl.from('.gsap-header', {
+          opacity: 0,
+          y: -14,
+          duration: 0.5,
+        })
+          .from(
+            '.gsap-pill',
+            {
+              opacity: 0,
+              y: 12,
+              duration: 0.4,
+            },
+            '-=0.2'
+          )
+          .from(
+            '.gsap-title',
+            {
+              opacity: 0,
+              y: 20,
+              duration: 0.6,
+            },
+            '-=0.2'
+          )
+          .from(
+            '.gsap-text',
+            {
+              opacity: 0,
+              y: 16,
+              duration: 0.5,
+            },
+            '-=0.3'
+          )
+          .from(
+            '.gsap-ctas',
+            {
+              opacity: 0,
+              y: 16,
+              duration: 0.5,
+            },
+            '-=0.3'
+          )
+          .from(
+            '.gsap-visual-container',
+            {
+              opacity: 0,
+              scale: 0.96,
+              duration: 0.6,
+            },
+            '-=0.3'
+          )
+          .fromTo(
+            '.gsap-curve-decay',
+            { strokeDashoffset: 500 },
+            { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' },
+            '-=0.2'
+          )
+          .fromTo(
+            '.gsap-curve-sm2',
+            { strokeDashoffset: 500 },
+            { strokeDashoffset: 0, duration: 1.3, ease: 'power2.out' },
+            '-=0.7'
+          )
+          .from(
+            '.gsap-marker',
+            {
+              opacity: 0,
+              scale: 0,
+              stagger: 0.08,
+              duration: 0.4,
+              ease: 'back.out(2)',
+            },
+            '-=0.5'
+          )
+          .from(
+            '.gsap-card-item',
+            {
+              opacity: 0,
+              y: 20,
+              stagger: 0.08,
+              duration: 0.5,
+            },
+            '-=0.4'
+          );
       });
-      gsap.to('.vault-ring-outer', {
-        rotation: 360, transformOrigin: '50% 50%', duration: 22, repeat: -1, ease: 'none'
-      });
-      gsap.to('.vault-ring-inner', {
-        rotation: -360, transformOrigin: '50% 50%', duration: 16, repeat: -1, ease: 'none'
-      });
-      gsap.to('.vault-star-1', {
-        y: -10, opacity: 0.8, duration: 2, repeat: -1, yoyo: true, ease: 'sine.inOut'
-      });
-      gsap.to('.vault-star-2', {
-        y: 10, opacity: 0.6, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut'
-      });
-      gsap.to('.vault-star-3', {
-        scale: 1.2, opacity: 0.9, transformOrigin: '50% 50%', duration: 1.5, repeat: -1, yoyo: true, ease: 'power1.inOut'
-      });
-      gsap.to('.vault-item-left', {
-        y: -8, rotation: 5, transformOrigin: '50% 50%', duration: 2.8, repeat: -1, yoyo: true, ease: 'sine.inOut'
-      });
-      gsap.to('.vault-item-right', {
-        y: -12, rotation: -5, transformOrigin: '50% 50%', duration: 3.2, repeat: -1, yoyo: true, ease: 'sine.inOut'
+
+      mm.add('(prefers-reduced-motion: reduce)', () => {
+        // Immediate appearance without displacement
+        gsap.set(
+          [
+            '.gsap-header',
+            '.gsap-pill',
+            '.gsap-title',
+            '.gsap-text',
+            '.gsap-ctas',
+            '.gsap-visual-container',
+            '.gsap-card-item',
+          ],
+          { opacity: 1, y: 0, scale: 1 }
+        );
+        gsap.set(['.gsap-curve-decay', '.gsap-curve-sm2'], {
+          strokeDashoffset: 0,
+        });
+        gsap.set('.gsap-marker', { opacity: 1, scale: 1 });
       });
     }, containerRef);
 
@@ -88,42 +131,48 @@ export default function LandingClient() {
 
   const handleCardMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     gsap.to(e.currentTarget, {
-      y: -6, scale: 1.025,
-      borderColor: 'rgba(99, 102, 241, 0.35)',
-      boxShadow: '0 20px 40px -15px rgba(99, 102, 241, 0.12)',
-      duration: 0.35, ease: 'power2.out'
+      y: -4,
+      borderColor: 'rgba(99, 102, 241, 0.4)',
+      boxShadow: '0 16px 32px -12px rgba(99, 102, 241, 0.1)',
+      duration: 0.24,
+      ease: 'power2.out',
     });
   };
 
   const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     gsap.to(e.currentTarget, {
-      y: 0, scale: 1,
+      y: 0,
       borderColor: 'rgba(255, 255, 255, 0.08)',
       boxShadow: 'none',
-      duration: 0.35, ease: 'power2.out'
+      duration: 0.24,
+      ease: 'power2.out',
     });
   };
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-background text-foreground flex flex-col overflow-hidden">
-
-      {/* Decorative Background Blur Nodes */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px] pointer-events-none" />
+    <div
+      ref={containerRef}
+      className="relative min-h-screen bg-background text-foreground flex flex-col overflow-hidden select-none"
+    >
+      {/* Decorative Subtle Background Gradients */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/10 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[130px] pointer-events-none" />
 
       {/* ── HEADER ─────────────────────────────────────────── */}
-      <header className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center z-20">
-
+      <header className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center z-20 gsap-header">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-extrabold text-xl tracking-tight gsap-logo shrink-0">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-extrabold text-xl tracking-tight shrink-0"
+        >
           <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-            <Sparkles className="h-5 w-5 animate-pulse" />
+            <Sparkles className="h-5 w-5" />
           </div>
           <span className="text-gradient">StudyVault</span>
         </Link>
 
         {/* Desktop nav actions */}
-        <div className="hidden sm:flex items-center gap-3 gsap-header-actions">
+        <div className="hidden sm:flex items-center gap-3">
           <ThemeToggle />
           <Link
             href="/login"
@@ -133,14 +182,14 @@ export default function LandingClient() {
           </Link>
           <Link
             href="/signup"
-            className="text-sm font-semibold bg-card text-foreground hover:bg-muted border border-border px-4 py-2 rounded-lg transition-all"
+            className="text-sm font-semibold bg-card text-foreground hover:bg-muted border border-border px-4 py-2 rounded-xl transition-all shadow-xs"
           >
             Create Account
           </Link>
         </div>
 
         {/* Mobile: theme toggle + hamburger */}
-        <div className="flex sm:hidden items-center gap-2 gsap-header-actions">
+        <div className="flex sm:hidden items-center gap-2">
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -173,123 +222,171 @@ export default function LandingClient() {
       </header>
 
       {/* ── HERO ───────────────────────────────────────────── */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-8 md:pt-10 md:pb-12 flex flex-col lg:grid lg:grid-cols-12 lg:gap-10 items-center z-10">
-
-        {/* Left: Copy */}
-        <div className="lg:col-span-7 text-center lg:text-left flex flex-col items-center lg:items-start gap-5">
-
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-10 md:pt-12 md:pb-16 flex flex-col lg:grid lg:grid-cols-12 lg:gap-12 items-center z-10">
+        {/* Left: Academic Copy */}
+        <div className="lg:col-span-6 text-center lg:text-left flex flex-col items-center lg:items-start gap-5">
           {/* Badge pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold tracking-wide gsap-pill shadow-sm">
-            <Sparkles className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
-            Supercharge Your Study Flow
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 dark:text-indigo-300 text-xs font-bold tracking-wide gsap-pill shadow-xs">
+            <Brain className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+            Active Recall &amp; Cognitive Architecture
           </div>
 
           {/* Headline */}
-          <h1 className="text-[2.5rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight gsap-title">
-            Your personal knowledge
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight gsap-title leading-[1.15]">
+            Structured knowledge.
             <br />
-            <span className="text-gradient">vault for learning</span>
+            <span className="text-gradient">Engineered retention.</span>
           </h1>
 
           {/* Sub-copy */}
-          <p className="text-base sm:text-lg text-muted-foreground max-w-lg gsap-text leading-relaxed">
-            Organise notes, master materials using spaced-repetition flashcards, and manage your academic schedule with a sleek, minimalist planner.
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg gsap-text leading-relaxed">
+            StudyVault integrates Markdown note-taking, topological knowledge graphs, and the SuperMemo SM-2 spaced repetition algorithm into a calm, focused personal learning sanctuary.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="gsap-ctas flex flex-col min-[480px]:flex-row gap-3 w-full sm:w-auto">
+          {/* Primary & Secondary CTAs */}
+          <div className="gsap-ctas flex flex-col min-[480px]:flex-row gap-3 w-full sm:w-auto pt-2">
             <Link
-              href="/signup"
-              className="flex items-center justify-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all text-sm sm:text-base"
+              href="/dashboard/flashcards?action=practice"
+              className="flex items-center justify-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all text-sm cursor-pointer"
             >
-              Get Started Free <ArrowRight className="h-4 w-4 shrink-0" />
+              Start Review <ArrowRight className="h-4 w-4 shrink-0" />
             </Link>
             <Link
-              href="/login"
-              className="flex items-center justify-center bg-card border border-border text-foreground hover:bg-muted font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl transition-all text-sm sm:text-base"
+              href="/dashboard"
+              className="flex items-center justify-center bg-card border border-border text-foreground hover:bg-muted font-semibold px-6 py-3.5 rounded-xl transition-all text-sm cursor-pointer"
             >
-              Access Dashboard
+              Explore Dashboard
             </Link>
           </div>
         </div>
 
-        {/* Right: Animated SVG */}
-        <div className="lg:col-span-5 flex justify-center items-center w-full mt-8 lg:mt-0 gsap-vault-area select-none">
-          <svg
-            width="450" height="450" viewBox="0 0 450 450"
-            fill="none" xmlns="http://www.w3.org/2000/svg"
-            className="w-full max-w-60 sm:max-w-[320px] md:max-w-95 lg:max-w-105 drop-shadow-2xl"
-          >
-            <circle cx="225" cy="225" r="125" fill="url(#vault-glow)" opacity="0.35" />
-            <circle cx="225" cy="225" r="160" stroke="currentColor" strokeWidth="1.5" strokeDasharray="6 10" className="text-indigo-500/25 vault-ring-outer" />
-            <circle cx="225" cy="225" r="115" stroke="currentColor" strokeWidth="1" strokeDasharray="4 8" className="text-purple-500/25 vault-ring-inner" />
+        {/* Right: Academic Storytelling SVG (Ebbinghaus vs. SM-2 Consolidation) */}
+        <div className="lg:col-span-6 flex justify-center items-center w-full mt-10 lg:mt-0 gsap-visual-container">
+          <div className="w-full max-w-lg glass-panel bg-card/90 border border-border/80 rounded-3xl p-6 shadow-2xl backdrop-blur-xl">
+            {/* Header of graphic */}
+            <div className="flex items-center justify-between border-b border-border/60 pb-3 mb-4">
+              <div>
+                <span className="text-[10px] font-mono text-indigo-400 font-bold uppercase tracking-wider block">
+                  Memory Consolidation Dynamics
+                </span>
+                <h3 className="text-sm font-bold text-foreground">
+                  Ebbinghaus Decay vs. SM-2 Spaced Recall
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-semibold">
+                {"R = e^(-t/S)"}
+              </span>
+            </div>
 
-            <g className="vault-body">
-              <path d="M120 120L123 128L131 131L123 134L120 142L117 134L109 131L117 128L120 120Z" fill="#818cf8" className="vault-star-1" />
-              <path d="M330 320L332 326L338 328L332 330L330 336L328 330L322 328L328 326L330 320Z" fill="#a78bfa" className="vault-star-2" />
-              <path d="M225 60L228 72L240 75L228 78L225 90L222 78L210 75L222 72L225 60Z" fill="#60a5fa" className="vault-star-3" />
-              <rect x="155" y="145" width="140" height="160" rx="24" fill="url(#shield-fill)" stroke="url(#shield-stroke)" strokeWidth="2" />
-              <circle cx="225" cy="225" r="35" fill="url(#core-glow)" />
-              <path d="M225 212L227.5 220L235 222.5L227.5 225L225 233L222.5 225L215 222.5L222.5 220L225 212Z" fill="#ffffff" />
-              <g transform="translate(90, 220)" className="vault-item-left">
-                <rect width="24" height="18" rx="3" fill="url(#book-fill)" stroke="#818cf8" strokeWidth="1" />
-                <line x1="4" y1="5" x2="20" y2="5" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-                <line x1="4" y1="9" x2="16" y2="9" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-                <line x1="4" y1="13" x2="12" y2="13" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-              </g>
-              <g transform="translate(330, 200)" className="vault-item-right">
-                <rect width="24" height="18" rx="3" fill="url(#book-fill)" stroke="#a78bfa" strokeWidth="1" />
-                <line x1="4" y1="5" x2="20" y2="5" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-                <line x1="4" y1="9" x2="16" y2="9" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-                <line x1="4" y1="13" x2="12" y2="13" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-              </g>
-            </g>
+            {/* SVG Graph Graphic */}
+            <svg
+              viewBox="0 0 500 280"
+              className="w-full h-auto overflow-visible"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="sm2AreaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                </linearGradient>
+                <linearGradient id="decayGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity="0.1" />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+                </linearGradient>
+              </defs>
 
-            <defs>
-              <radialGradient id="vault-glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.45" />
-                <stop offset="100%" stopColor="#4f46e5" stopOpacity="0" />
-              </radialGradient>
-              <linearGradient id="shield-fill" x1="155" y1="145" x2="295" y2="305" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
-              </linearGradient>
-              <linearGradient id="shield-stroke" x1="155" y1="145" x2="295" y2="305" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#818cf8" stopOpacity="0.4" />
-                <stop offset="50%" stopColor="#a78bfa" stopOpacity="0.15" />
-                <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.5" />
-              </linearGradient>
-              <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#818cf8" />
-                <stop offset="45%" stopColor="#6366f1" stopOpacity="0.85" />
-                <stop offset="100%" stopColor="#a855f7" stopOpacity="0" />
-              </radialGradient>
-              <linearGradient id="book-fill" x1="0" y1="0" x2="24" y2="18" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.5" />
-              </linearGradient>
-            </defs>
-          </svg>
+              {/* Grid Lines */}
+              <line x1="50" y1="40" x2="480" y2="40" stroke="currentColor" strokeOpacity="0.08" strokeDasharray="3 3" />
+              <line x1="50" y1="90" x2="480" y2="90" stroke="currentColor" strokeOpacity="0.08" strokeDasharray="3 3" />
+              <line x1="50" y1="150" x2="480" y2="150" stroke="currentColor" strokeOpacity="0.08" strokeDasharray="3 3" />
+              <line x1="50" y1="210" x2="480" y2="210" stroke="currentColor" strokeOpacity="0.12" />
+
+              {/* Axis Y Labels */}
+              <text x="40" y="44" textAnchor="end" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">100%</text>
+              <text x="40" y="94" textAnchor="end" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">75%</text>
+              <text x="40" y="154" textAnchor="end" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">50%</text>
+              <text x="40" y="214" textAnchor="end" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">20%</text>
+
+              {/* Axis X Time Labels */}
+              <text x="50" y="235" textAnchor="middle" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">Day 0</text>
+              <text x="140" y="235" textAnchor="middle" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">Day 1</text>
+              <text x="240" y="235" textAnchor="middle" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">Day 6</text>
+              <text x="360" y="235" textAnchor="middle" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">Day 16</text>
+              <text x="460" y="235" textAnchor="middle" fill="currentColor" fillOpacity="0.5" className="text-[10px] font-mono">Day 35</text>
+
+              {/* Exponential Forgetting Curve (Red/Orange dashed decay) */}
+              <path
+                d="M 50 40 Q 110 180 460 210"
+                stroke="#f87171"
+                strokeWidth="2"
+                strokeDasharray="4 4"
+                strokeDashoffset="500"
+                className="gsap-curve-decay"
+              />
+
+              {/* SM-2 Spaced Repetition Sawtooth Curve (Reinforcement Waves) */}
+              {/* Review 1 (Day 1): Jump back to 95%, decays slower */}
+              {/* Review 2 (Day 6): Jump back to 98%, decays much slower */}
+              {/* Review 3 (Day 16): Jump to 100%, nearly flat */}
+              <path
+                d="M 50 40 Q 95 110 140 145 L 140 46 Q 190 85 240 110 L 240 44 Q 300 68 360 80 L 360 42 Q 410 48 460 54"
+                stroke="#818cf8"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray="500"
+                strokeDashoffset="500"
+                className="gsap-curve-sm2"
+              />
+
+              {/* Recall Event Markers */}
+              <g className="gsap-marker">
+                <circle cx="140" cy="46" r="4.5" fill="#818cf8" stroke="#ffffff" strokeWidth="1.5" />
+                <line x1="140" y1="46" x2="140" y2="210" stroke="#818cf8" strokeOpacity="0.25" strokeDasharray="2 2" />
+              </g>
+              <g className="gsap-marker">
+                <circle cx="240" cy="44" r="4.5" fill="#818cf8" stroke="#ffffff" strokeWidth="1.5" />
+                <line x1="240" y1="44" x2="240" y2="210" stroke="#818cf8" strokeOpacity="0.25" strokeDasharray="2 2" />
+              </g>
+              <g className="gsap-marker">
+                <circle cx="360" cy="42" r="4.5" fill="#818cf8" stroke="#ffffff" strokeWidth="1.5" />
+                <line x1="360" y1="42" x2="360" y2="210" stroke="#818cf8" strokeOpacity="0.25" strokeDasharray="2 2" />
+              </g>
+            </svg>
+
+            {/* Legend Footer */}
+            <div className="flex items-center justify-between border-t border-border/50 pt-3 text-[11px]">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-indigo-400" />
+                <span className="font-semibold text-foreground">SM-2 Spaced Recall (&gt;90% Retention)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-3 border-b-2 border-dashed border-red-400 inline-block" />
+                <span className="text-muted-foreground">Standard Decay</span>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
-      {/* ── FEATURE CARDS ──────────────────────────────────── */}
+      {/* ── 4 PILLARS FEATURE SUITE ──────────────────────────── */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20 z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Notes Card */}
           <div
             onMouseEnter={handleCardMouseEnter}
             onMouseLeave={handleCardMouseLeave}
-            className="glass-panel rounded-2xl p-5 sm:p-6 relative group overflow-hidden transition-all duration-300 gsap-card-item"
+            className="glass-panel rounded-2xl p-5 sm:p-6 relative group overflow-hidden transition-all duration-300 gsap-card-item cursor-default"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all" />
-            <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-card border border-border flex items-center justify-center text-indigo-400 mb-4 sm:mb-5">
-              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
+            <div className="h-11 w-11 rounded-xl bg-card border border-border flex items-center justify-center text-indigo-400 mb-4">
+              <BookOpen className="h-5 w-5" />
             </div>
-            <h3 className="text-base sm:text-lg font-bold mb-2 group-hover:text-indigo-400 transition-colors">Notes Vault</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Create, tag, and structure notes. Side-by-side edit and live markdown preview rendering for robust note-taking.
+            <h3 className="text-base font-bold mb-2 group-hover:text-indigo-400 transition-colors">
+              Notes Vault
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Markdown note capture with live split preview, folder taxonomy, and automated AI conceptual distillation.
             </p>
           </div>
 
@@ -297,15 +394,33 @@ export default function LandingClient() {
           <div
             onMouseEnter={handleCardMouseEnter}
             onMouseLeave={handleCardMouseLeave}
-            className="glass-panel rounded-2xl p-5 sm:p-6 relative group overflow-hidden transition-all duration-300 gsap-card-item"
+            className="glass-panel rounded-2xl p-5 sm:p-6 relative group overflow-hidden transition-all duration-300 gsap-card-item cursor-default"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all" />
-            <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-card border border-border flex items-center justify-center text-purple-400 mb-4 sm:mb-5">
-              <Layers className="h-5 w-5 sm:h-6 sm:w-6" />
+            <div className="h-11 w-11 rounded-xl bg-card border border-border flex items-center justify-center text-purple-400 mb-4">
+              <Layers className="h-5 w-5" />
             </div>
-            <h3 className="text-base sm:text-lg font-bold mb-2 group-hover:text-purple-400 transition-colors">Active Recall Decks</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Build custom card decks. Utilises the SuperMemo SM-2 spaced repetition scheduler to maximize knowledge retention.
+            <h3 className="text-base font-bold mb-2 group-hover:text-purple-400 transition-colors">
+              Active Recall Decks
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Tactile flashcard review powered by the SuperMemo SM-2 algorithm to permanently defeat the forgetting curve.
+            </p>
+          </div>
+
+          {/* Knowledge Graph Card */}
+          <div
+            onMouseEnter={handleCardMouseEnter}
+            onMouseLeave={handleCardMouseLeave}
+            className="glass-panel rounded-2xl p-5 sm:p-6 relative group overflow-hidden transition-all duration-300 gsap-card-item cursor-default"
+          >
+            <div className="h-11 w-11 rounded-xl bg-card border border-border flex items-center justify-center text-cyan-400 mb-4">
+              <Network className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-bold mb-2 group-hover:text-cyan-400 transition-colors">
+              Knowledge Graph
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Interactive 2D/3D WebGL topological network mapping cross-disciplinary links between notes, decks, and concepts.
             </p>
           </div>
 
@@ -313,26 +428,25 @@ export default function LandingClient() {
           <div
             onMouseEnter={handleCardMouseEnter}
             onMouseLeave={handleCardMouseLeave}
-            className="glass-panel rounded-2xl p-5 sm:p-6 relative group overflow-hidden transition-all duration-300 gsap-card-item sm:col-span-2 lg:col-span-1"
+            className="glass-panel rounded-2xl p-5 sm:p-6 relative group overflow-hidden transition-all duration-300 gsap-card-item cursor-default"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all" />
-            <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-card border border-border flex items-center justify-center text-emerald-400 mb-4 sm:mb-5">
-              <CheckSquare className="h-5 w-5 sm:h-6 sm:w-6" />
+            <div className="h-11 w-11 rounded-xl bg-card border border-border flex items-center justify-center text-emerald-400 mb-4">
+              <CheckSquare className="h-5 w-5" />
             </div>
-            <h3 className="text-base sm:text-lg font-bold mb-2 group-hover:text-emerald-400 transition-colors">Prioritized Tasks</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Track deadlines and project status on a prioritized Kanban board. Keep assignments and milestones fully organized.
+            <h3 className="text-base font-bold mb-2 group-hover:text-emerald-400 transition-colors">
+              Task Board
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Fluid cross-column Kanban task board keeping revision milestones and daily study commitments structured.
             </p>
           </div>
-
         </div>
       </section>
 
       {/* ── FOOTER ─────────────────────────────────────────── */}
       <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 border-t border-border text-center text-xs text-muted-foreground z-10">
-        <p>&copy; {new Date().getFullYear()} StudyVault. Powered by Next.js &amp; MongoDB.</p>
+        <p>&copy; {new Date().getFullYear()} StudyVault. Engineered for calm, intellectual mastery.</p>
       </footer>
-
     </div>
   );
 }

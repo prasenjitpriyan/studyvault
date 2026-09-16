@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Layers, Plus, Trash2, ArrowLeft, CheckCircle, HelpCircle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Layers, Plus, Trash2, ArrowLeft, HelpCircle, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
+import ReviewSession from '@/components/review/ReviewSession';
+import Modal from '@/components/ui/Modal';
 
 interface Deck {
   _id: string;
@@ -18,6 +21,8 @@ interface Flashcard {
   back: string;
   nextReview: string;
   repetitions: number;
+  interval?: number;
+  easeFactor?: number;
 }
 
 export default function FlashcardsPage() {
@@ -30,8 +35,6 @@ export default function FlashcardsPage() {
   // Practice session state
   const [viewMode, setViewMode] = useState<'decks' | 'practice' | 'manage'>('decks');
   const [practiceCards, setPracticeCards] = useState<Flashcard[]>([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
 
   // Modal / Form States
   const [deckModalOpen, setDeckModalOpen] = useState(false);
@@ -42,25 +45,8 @@ export default function FlashcardsPage() {
   const [cardFront, setCardFront] = useState('');
   const [cardBack, setCardBack] = useState('');
 
-  useEffect(() => {
-    const fetchDecks = async () => {
-      try {
-        const res = await fetch('/api/decks');
-        if (res.ok) {
-          const data = await res.json();
-          setDecks(data.decks || []);
-        }
-      } catch {
-        toast.error('Failed to load decks.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchDecks();
-  }, []);
-
   // Fetch Flashcards for selected deck
-  const fetchFlashcards = async (deckId: string) => {
+  const fetchFlashcards = useCallback(async (deckId: string) => {
     setIsLoadingCards(true);
     try {
       const res = await fetch(`/api/decks/${deckId}/flashcards`);
@@ -73,21 +59,44 @@ export default function FlashcardsPage() {
         const now = new Date();
         const due = cards.filter((card: Flashcard) => new Date(card.nextReview) <= now);
         setPracticeCards(due.length > 0 ? due : cards);
-        setCurrentCardIndex(0);
-        setIsFlipped(false);
       }
     } catch {
       toast.error('Failed to load flashcards.');
     } finally {
       setIsLoadingCards(false);
     }
-  };
+  }, []);
 
-  const handleSelectDeck = (deck: Deck, view: 'practice' | 'manage') => {
+  const handleSelectDeck = useCallback((deck: Deck, view: 'practice' | 'manage') => {
     setActiveDeck(deck);
     setViewMode(view);
     fetchFlashcards(deck._id);
-  };
+  }, [fetchFlashcards]);
+
+  useEffect(() => {
+    const fetchDecks = async () => {
+      try {
+        const res = await fetch('/api/decks');
+        if (res.ok) {
+          const data = await res.json();
+          const loadedDecks = data.decks || [];
+          setDecks(loadedDecks);
+
+          if (typeof window !== 'undefined' && loadedDecks.length > 0) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('action') === 'practice') {
+              handleSelectDeck(loadedDecks[0], 'practice');
+            }
+          }
+        }
+      } catch {
+        toast.error('Failed to load decks.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDecks();
+  }, [handleSelectDeck]);
 
   // Dynamically update document title to reflect active deck name
   useEffect(() => {
@@ -186,48 +195,26 @@ export default function FlashcardsPage() {
     }
   };
 
-  // Grade Card (Spaced Repetition SM-2 Alg hook)
-  const handleGradeCard = async (rating: 'easy' | 'good' | 'hard') => {
-    if (practiceCards.length === 0) return;
-    const currentCard = practiceCards[currentCardIndex];
-
-    try {
-      const res = await fetch(`/api/flashcards/${currentCard._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating }),
-      });
-
-      if (res.ok) {
-        setIsFlipped(false);
-        // Delay moving to the next card slightly to allow flip animation back to front
-        setTimeout(() => {
-          if (currentCardIndex + 1 < practiceCards.length) {
-            setCurrentCardIndex((prev) => prev + 1);
-          } else {
-            // End of practice session
-            toast.success('Flashcard review session complete!');
-            fetchFlashcards(activeDeck!._id); // Refresh cards review dates
-            setViewMode('decks');
-          }
-        }, 300);
-      }
-    } catch {
-      toast.error('Could not update card rating.');
-    }
-  };
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <div className="space-y-6">
-
-      {/* 1. DECKS INDEX VIEW */}
-      {viewMode === 'decks' && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight">Active Recall Decks</h1>
-              <p className="text-sm text-muted-foreground mt-1">Review flashcards with optimized spaced repetition schedules.</p>
-            </div>
+      <AnimatePresence mode="wait">
+        {/* 1. DECKS INDEX VIEW */}
+        {viewMode === 'decks' && (
+          <motion.div
+            key="decks-index"
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.16, ease: 'easeOut' }}
+            className="space-y-6"
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight">Active Recall Decks</h1>
+                <p className="text-sm text-muted-foreground mt-1">Review flashcards with optimized spaced repetition schedules.</p>
+              </div>
             <button
               onClick={() => setDeckModalOpen(true)}
               className="flex items-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-lg cursor-pointer transition-all hover:scale-[1.01]"
@@ -298,128 +285,45 @@ export default function FlashcardsPage() {
               ))}
             </div>
           )}
-        </div>
-      )}
+          </motion.div>
+        )}
 
-      {/* 2. FLASHCARD PRACTICE WORKSPACE */}
+      {/* 2. FLASHCARD PRACTICE WORKSPACE (POWERED BY MOTION & SM-2) */}
       {viewMode === 'practice' && activeDeck && (
-        <div className="space-y-6 max-w-2xl mx-auto">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setViewMode('decks')}
-              className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </button>
-            <div>
-              <h2 className="text-xl font-bold">{activeDeck.name}</h2>
-              <p className="text-xs text-muted-foreground">Practice Session &bull; Active Recall Mode</p>
-            </div>
-          </div>
-
+        <motion.div
+          key="practice-view"
+          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
+          animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+          exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+        >
           {isLoadingCards ? (
             <div className="flex justify-center py-20">
               <Loader2 className="h-6 w-6 animate-spin text-indigo-400" />
             </div>
-          ) : practiceCards.length === 0 ? (
-            <div className="text-center py-16 glass-panel rounded-2xl">
-              <CheckCircle className="h-12 w-12 text-emerald-400 mx-auto mb-4" />
-              <h3 className="font-bold text-foreground">Deck Fully Reviewed!</h3>
-              <p className="text-xs text-muted-foreground mt-2 max-w-sm mx-auto mb-6 leading-relaxed">
-                Awesome work! All cards in this deck are scheduled for a future review date.
-              </p>
-              <div className="flex justify-center gap-3">
-                <button
-                  onClick={() => {
-                    // Force study everything by copying all cards
-                    setPracticeCards(flashcards);
-                    setCurrentCardIndex(0);
-                    setIsFlipped(false);
-                  }}
-                  disabled={flashcards.length === 0}
-                  className="bg-card border border-border text-xs px-4 py-2.5 rounded-lg text-foreground hover:bg-muted font-bold transition-all disabled:opacity-50"
-                >
-                  Re-Study All Cards ({flashcards.length})
-                </button>
-                <button
-                  onClick={() => setViewMode('decks')}
-                  className="bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition-all"
-                >
-                  Back to Decks
-                </button>
-              </div>
-            </div>
           ) : (
-            <div className="space-y-8">
-              {/* Progress counter */}
-              <div className="flex justify-between items-center text-xs text-muted-foreground font-semibold px-1">
-                <span>Card {currentCardIndex + 1} of {practiceCards.length}</span>
-                <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/15 px-2.5 py-0.5 rounded-full font-bold">
-                  {practiceCards.length - currentCardIndex} Left
-                </span>
-              </div>
-
-              {/* 3D Flip Card Container */}
-              <div
-                className="w-full h-80 perspective-1000 cursor-pointer"
-                onClick={() => setIsFlipped(!isFlipped)}
-              >
-                <div className={`w-full h-full relative transition-transform duration-500 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
-
-                  {/* Front Side */}
-                  <div className="absolute inset-0 w-full h-full backface-hidden glass-panel bg-card/40 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
-                    <div className="flex-1 flex items-center justify-center">
-                      <p className="flashcard-text text-foreground font-semibold max-w-md wrap-break-word text-center">{practiceCards[currentCardIndex]?.front}</p>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold bg-card/80 px-3 py-1 rounded-full border border-border">
-                      Click to flip & view answer
-                    </span>
-                  </div>
-
-                  {/* Back Side */}
-                  <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 glass-panel border-indigo-500/20 bg-card/40 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
-                    <div className="flex-1 flex items-center justify-center">
-                      <p className="flashcard-text text-foreground font-semibold max-w-md wrap-break-word text-center">{practiceCards[currentCardIndex]?.back}</p>
-                    </div>
-                    <span className="text-[10px] text-indigo-400/80 uppercase tracking-widest font-bold bg-indigo-500/5 px-3 py-1 rounded-full border border-indigo-500/10">
-                      Answer Revealed
-                    </span>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* Active Recall Scheduler feedback buttons */}
-              {isFlipped && (
-                <div className="flex justify-center gap-3 bg-card/40 border border-border p-3 rounded-2xl animate-fade-in">
-                  <button
-                    onClick={() => handleGradeCard('hard')}
-                    className="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-bold rounded-xl text-xs transition-all cursor-pointer"
-                  >
-                    Hard
-                  </button>
-                  <button
-                    onClick={() => handleGradeCard('good')}
-                    className="flex-1 py-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-400 font-bold rounded-xl text-xs transition-all cursor-pointer"
-                  >
-                    Good
-                  </button>
-                  <button
-                    onClick={() => handleGradeCard('easy')}
-                    className="flex-1 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-bold rounded-xl text-xs transition-all cursor-pointer"
-                  >
-                    Easy
-                  </button>
-                </div>
-              )}
-            </div>
+            <ReviewSession
+              deck={activeDeck}
+              initialCards={practiceCards.length > 0 ? practiceCards : flashcards}
+              onExit={() => {
+                setViewMode('decks');
+                fetchFlashcards(activeDeck._id);
+              }}
+            />
           )}
-        </div>
+        </motion.div>
       )}
 
       {/* 3. CARD MANAGER VIEW */}
       {viewMode === 'manage' && activeDeck && (
-        <div className="space-y-6">
+        <motion.div
+          key="manage-view"
+          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+          transition={{ duration: 0.16, ease: 'easeOut' }}
+          className="space-y-6"
+        >
           <div className="flex justify-between items-center flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <button
@@ -504,107 +408,108 @@ export default function FlashcardsPage() {
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
+    </AnimatePresence>
 
       {/* --- MODAL: CREATE DECK --- */}
-      {deckModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl relative">
-            <h3 className="text-md font-bold mb-4">Create New Deck</h3>
-            <form onSubmit={handleCreateDeck} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Deck Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Physics Formulas, Spanish Vocabulary"
-                  value={deckName}
-                  onChange={(e) => setDeckName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Description</label>
-                <textarea
-                  placeholder="Summary of this deck..."
-                  value={deckDesc}
-                  onChange={(e) => setDeckDesc(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setDeckModalOpen(false)}
-                  className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg"
-                >
-                  Create Deck
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={deckModalOpen}
+        onClose={() => setDeckModalOpen(false)}
+        title="Create New Deck"
+        description="Group flashcards by topic or study curriculum."
+      >
+        <form onSubmit={handleCreateDeck} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Deck Name</label>
+            <input
+              type="text"
+              placeholder="e.g. Physics Formulas, Spanish Vocabulary"
+              value={deckName}
+              onChange={(e) => setDeckName(e.target.value)}
+              className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground"
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Description</label>
+            <textarea
+              placeholder="Summary of this deck..."
+              value={deckDesc}
+              onChange={(e) => setDeckDesc(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setDeckModalOpen(false)}
+              className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg cursor-pointer"
+            >
+              Create Deck
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* --- MODAL: ADD CARD --- */}
-      {cardModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl relative">
-            <h3 className="text-md font-bold mb-4">Add Flashcard</h3>
-            <form onSubmit={handleCreateCard} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Front / Question</label>
-                <textarea
-                  placeholder="Type the front prompt or question..."
-                  value={cardFront}
-                  onChange={(e) => setCardFront(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Back / Answer</label>
-                <textarea
-                  placeholder="Type the answer or details..."
-                  value={cardBack}
-                  onChange={(e) => setCardBack(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
-                  required
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setCardModalOpen(false)}
-                  className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg"
-                >
-                  Add Card
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={cardModalOpen}
+        onClose={() => setCardModalOpen(false)}
+        title="Add Flashcard"
+        description="Craft an active recall question and answer."
+      >
+        <form onSubmit={handleCreateCard} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Front / Question</label>
+            <textarea
+              placeholder="Type the front prompt or question..."
+              value={cardFront}
+              onChange={(e) => setCardFront(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Back / Answer</label>
+            <textarea
+              placeholder="Type the answer or details..."
+              value={cardBack}
+              onChange={(e) => setCardBack(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-2.5 bg-card border border-border focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl outline-none text-sm text-foreground resize-none"
+              required
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setCardModalOpen(false)}
+              className="px-4 py-2 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg cursor-pointer"
+            >
+              Add Card
+            </button>
+          </div>
+        </form>
+      </Modal>
 
     </div>
   );
